@@ -6,3 +6,6 @@ variable "main_vpc_cidr" {
   type = string
 }
 
+variable "controller_instances" {
+  type = number
+}
