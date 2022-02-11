@@ -18,8 +18,7 @@ resource "aws_instance" "controller" {
     ]
   ].availability_zone
 
-  # todo
-  #vpc_security_group_ids = [aws_security_group.bastion_ssh.id]
+  vpc_security_group_ids = [aws_security_group.controller.id]
 
   root_block_device {
     volume_size           = 30
