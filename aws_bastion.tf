@@ -10,10 +10,10 @@ resource "aws_instance" "bastion" {
 
   vpc_security_group_ids = [aws_security_group.bastion_ssh.id]
 
-  ebs_optimized = true
-
   root_block_device {
     volume_size           = 10
     delete_on_termination = true
   }
+
+  depends_on = [aws_internet_gateway.vpc]
 }
