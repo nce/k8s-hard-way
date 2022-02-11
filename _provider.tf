@@ -4,8 +4,8 @@ provider "aws" {
 
   default_tags {
     tags = {
-      owner = "ugo"
-      name  = "k8s-hard-way"
+      Owner = "ugo"
+      Name  = "k8s-hard-way"
     }
   }
 
