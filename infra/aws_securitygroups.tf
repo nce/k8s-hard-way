@@ -26,6 +26,7 @@ resource "aws_security_group" "controller" {
   dynamic "ingress" {
     # https://kubernetes.io/docs/reference/ports-and-protocols/
     for_each = {
+      22 : { protocol : "tcp", description : "ssh" },
       6443 : { protocol : "tcp", description : "apiserver" },
       2379 : { protocol : "tcp", description : "etcd apiserver" },
       2380 : { protocol : "tcp", description : "etcd" },

@@ -10,10 +10,30 @@ resource "aws_instance" "bastion" {
 
   vpc_security_group_ids = [aws_security_group.bastion_ssh.id]
 
+  user_data = data.cloudinit_config.bastion.rendered
+
   root_block_device {
     volume_size           = 10
     delete_on_termination = true
   }
 
   depends_on = [aws_internet_gateway.vpc]
+}
+
+data "cloudinit_config" "bastion" {
+  gzip          = false
+  base64_encode = false
+
+  part {
+    filename     = "10-baseos.sh"
+    content_type = "text/x-shellscript"
+    content      = file("cloudinit/10-baseos.sh")
+  }
+
+  part {
+    filename     = "99-kickstart.yaml"
+    content_type = "text/cloud-config"
+    content      = file("cloudinit/99-kickstart-bastion.yaml")
+  }
+
 }
