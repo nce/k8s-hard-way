@@ -26,6 +26,7 @@ resource "aws_security_group" "controller" {
   dynamic "ingress" {
     # https://kubernetes.io/docs/reference/ports-and-protocols/
     for_each = {
+      22 : { protocol : "tcp", description : "ssh" },
       6443 : { protocol : "tcp", description : "apiserver" },
       2379 : { protocol : "tcp", description : "etcd apiserver" },
       2380 : { protocol : "tcp", description : "etcd" },
@@ -45,6 +46,14 @@ resource "aws_security_group" "controller" {
     }
   }
 
+  ingress {
+    from_port = 0
+    protocol  = "-1"
+    to_port   = 0
+
+    security_groups = [aws_security_group.bastion.id]
+  }
+
   egress {
     from_port = 0
     protocol  = "-1"
@@ -56,9 +65,8 @@ resource "aws_security_group" "controller" {
 
 }
 
-resource "aws_security_group" "ssh" {
-  name        = "allow_ssh"
-  description = "Allow SSH inbound traffic"
+resource "aws_security_group" "bastion" {
+  description = "Allow bastion traffic"
   vpc_id      = aws_vpc.vpc.id
 
   ingress {

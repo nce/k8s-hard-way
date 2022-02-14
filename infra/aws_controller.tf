@@ -6,7 +6,6 @@ resource "aws_instance" "controller" {
 
   key_name = aws_key_pair.ugo.key_name
 
-  associate_public_ip_address = false
   subnet_id = aws_subnet.subnet[
     keys(data.aws_availability_zone.all)[
       (count.index) % length(keys(data.aws_availability_zone.all))
@@ -18,7 +17,8 @@ resource "aws_instance" "controller" {
     ]
   ].availability_zone
 
-  vpc_security_group_ids = [aws_security_group.controller.id, aws_security_group.ssh.id]
+  vpc_security_group_ids      = [aws_security_group.controller.id]
+  associate_public_ip_address = true
 
   user_data = data.cloudinit_config.controller.rendered
 
