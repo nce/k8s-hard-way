@@ -1,8 +1,7 @@
-#!/usr/bin/env bash
-set -e
-{
-  timedatectl set-timezone Europe/Berlin
+#!/bin/bash
+set -xe
 
-  yum -y remove cockpit*
-  yum -y install vim curl rsync
-} >> cloudinit.log
+exec > >(tee /var/log/user-data.log|logger -t user-data ) 2>&1
+
+yum -y install vim curl rsync
+timedatectl set-timezone "Europe/Berlin"
