@@ -18,7 +18,7 @@ resource "aws_instance" "controller" {
     ]
   ].availability_zone
 
-  vpc_security_group_ids = [aws_security_group.controller.id]
+  vpc_security_group_ids = [aws_security_group.controller.id, aws_security_group.ssh.id]
 
   user_data = data.cloudinit_config.controller.rendered
 

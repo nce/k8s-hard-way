@@ -8,7 +8,7 @@ resource "aws_instance" "bastion" {
   subnet_id                   = aws_subnet.subnet["eu-central-1a"].id
   availability_zone           = aws_subnet.subnet["eu-central-1a"].availability_zone
 
-  vpc_security_group_ids = [aws_security_group.bastion_ssh.id]
+  vpc_security_group_ids = [aws_security_group.ssh.id]
 
   user_data = data.cloudinit_config.bastion.rendered
 
