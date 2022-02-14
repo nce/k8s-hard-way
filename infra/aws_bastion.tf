@@ -30,10 +30,4 @@ data "cloudinit_config" "bastion" {
     content      = file("cloudinit/10-baseos.sh")
   }
 
-  part {
-    filename     = "99-kickstart.yaml"
-    content_type = "text/cloud-config"
-    content      = file("cloudinit/99-kickstart-bastion.yaml")
-  }
-
 }
