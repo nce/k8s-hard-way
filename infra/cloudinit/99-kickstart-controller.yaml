@@ -1,3 +1,0 @@
-runcmd:
-  - /root/10-baseos.sh
-  - /root/20-crio.sh
