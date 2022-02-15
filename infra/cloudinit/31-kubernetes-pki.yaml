@@ -1,0 +1,7 @@
+write_files:
+  - path: /home/ec2-user/pki/ca-key.pem
+    content: |
+      ${indent(6, ca_key)}
+  - path: /home/ec2-user/pki/ca-cert.pem
+    content: |
+      ${indent(6, ca_cert)}

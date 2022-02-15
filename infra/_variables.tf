@@ -9,3 +9,7 @@ variable "main_vpc_cidr" {
 variable "controller_instances" {
   type = number
 }
+
+variable "cluster_service_ip" {
+  type = string
+}

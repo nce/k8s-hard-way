@@ -43,5 +43,14 @@ data "cloudinit_config" "controller" {
     content_type = "text/x-shellscript"
     content      = file("cloudinit/20-crio.sh")
   }
+  part {
+    filename     = "31-kubernetes-pki.yaml"
+    content_type = "text/cloud-config"
+    content = templatefile("cloudinit/31-kubernetes-pki.yaml", {
+      ca_key  = tls_private_key.k8s_ca.private_key_pem,
+      ca_cert = tls_self_signed_cert.k8s_ca.cert_pem
+      }
+    )
+  }
 
 }
