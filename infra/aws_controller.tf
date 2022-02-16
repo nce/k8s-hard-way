@@ -44,13 +44,15 @@ data "cloudinit_config" "controller" {
     content      = file("cloudinit/20-crio.sh")
   }
   part {
-    filename     = "31-kubernetes-pki.yaml"
-    content_type = "text/cloud-config"
-    content = templatefile("cloudinit/31-kubernetes-pki.yaml", {
-      ca_key  = tls_private_key.k8s_ca.private_key_pem,
-      ca_cert = tls_self_signed_cert.k8s_ca.cert_pem
-      }
-    )
+    filename     = "30-kubernetes.sh"
+    content_type = "text/x-shellscript"
+    content = templatefile("cloudinit/30-kubernetes.sh", {
+      k8s_version          = var.k8s_version,
+      cluster_service_ip   = var.cluster_service_ip,
+      controller_instances = var.controller_instances,
+      cluster_public_ip    = aws_instance.bastion.public_ip,
+      # TODO: cycle dep resolven
+      etcd_server_ips = "https://${join(":2379,https://", ["1", "2", "3"])}:2379"
+    })
   }
-
 }

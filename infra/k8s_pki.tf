@@ -26,6 +26,34 @@ resource "tls_self_signed_cert" "k8s_ca" {
   ]
 }
 
+resource "local_file" "k8s_ca_key" {
+  content  = tls_private_key.k8s_ca.private_key_pem
+  filename = "./pki/ca-key.pem"
+}
+resource "local_file" "k8s_ca_cert" {
+  content  = tls_self_signed_cert.k8s_ca.cert_pem
+  filename = "./pki/ca-cert.pem"
+}
+
+resource "null_resource" "k8s_ca" {
+  count = var.controller_instances
+
+  connection {
+    type         = "ssh"
+    user         = "ec2-user"
+    host         = aws_instance.controller.*.private_ip[count.index]
+    bastion_host = aws_instance.bastion.public_ip
+  }
+
+  provisioner "file" {
+    source      = "./pki/ca-key.pem"
+    destination = "ca-key.pem"
+  }
+  provisioner "file" {
+    source      = "./pki/ca-cert.pem"
+    destination = "ca-cert.pem"
+  }
+}
 # ------------------------
 # -- [ apiserver cert ] --
 resource "tls_private_key" "k8s_apiserver" {
@@ -79,6 +107,35 @@ resource "tls_locally_signed_cert" "k8s_apiserver" {
     "client_auth",
     "server_auth",
   ]
+}
+
+resource "local_file" "k8s_apiserver_key" {
+  content  = tls_private_key.k8s_apiserver.private_key_pem
+  filename = "./pki/apiserver-key.pem"
+}
+resource "local_file" "k8s_apiserver_cert" {
+  content  = tls_locally_signed_cert.k8s_apiserver.cert_pem
+  filename = "./pki/apiserver-cert.pem"
+}
+
+resource "null_resource" "k8s_apiserver" {
+  count = var.controller_instances
+
+  connection {
+    type         = "ssh"
+    user         = "ec2-user"
+    host         = aws_instance.controller.*.private_ip[count.index]
+    bastion_host = aws_instance.bastion.public_ip
+  }
+
+  provisioner "file" {
+    source      = "./pki/apiserver-key.pem"
+    destination = "apiserver-key.pem"
+  }
+  provisioner "file" {
+    source      = "./pki/apiserver-cert.pem"
+    destination = "apiserver-cert.pem"
+  }
 }
 # -- [ apiserver cert ] --
 # ------------------------
@@ -317,6 +374,35 @@ resource "tls_locally_signed_cert" "k8s_service_account" {
     "client_auth",
     "server_auth",
   ]
+}
+
+resource "local_file" "k8s_service_account_key" {
+  content  = tls_private_key.k8s_service_account.private_key_pem
+  filename = "./pki/serviceaccount-key.pem"
+}
+resource "local_file" "k8s_service_account_cert" {
+  content  = tls_locally_signed_cert.k8s_service_account.cert_pem
+  filename = "./pki/serviceaccount-cert.pem"
+}
+
+resource "null_resource" "k8s_service_account" {
+  count = var.controller_instances
+
+  connection {
+    type         = "ssh"
+    user         = "ec2-user"
+    host         = aws_instance.controller.*.private_ip[count.index]
+    bastion_host = aws_instance.bastion.public_ip
+  }
+
+  provisioner "file" {
+    source      = "./pki/serviceaccount-key.pem"
+    destination = "serviceaccount-key.pem"
+  }
+  provisioner "file" {
+    source      = "./pki/serviceaccount-cert.pem"
+    destination = "serviceaccount-cert.pem"
+  }
 }
 # -- [ service_account cert ] --
 # ------------------------------

@@ -13,3 +13,7 @@ variable "controller_instances" {
 variable "cluster_service_ip" {
   type = string
 }
+
+variable "k8s_version" {
+  type = string
+}
