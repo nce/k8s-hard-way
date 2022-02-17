@@ -43,24 +43,59 @@ data "cloudinit_config" "controller" {
     content_type = "text/x-shellscript"
     content      = file("cloudinit/20-crio.sh")
   }
-  part {
-    filename     = "30-etcd.sh"
-    content_type = "text/x-shellscript"
-    content = templatefile("cloudinit/30-etcd.sh", {
-      etcd_version = var.etcd_version,
-    })
-  }
+}
 
-  part {
-    filename     = "30-kubernetes.sh"
-    content_type = "text/x-shellscript"
-    content = templatefile("cloudinit/35-kubernetes.sh", {
-      k8s_version          = var.k8s_version,
-      cluster_service_ip   = var.cluster_service_ip,
-      controller_instances = var.controller_instances,
-      cluster_public_ip    = aws_instance.bastion.public_ip,
-      # TODO: cycle dep resolven
-      etcd_server_ips = "https://${join(":2379,https://", aws_instance.controller.*.private_ip)}:2379"
-    })
+data "template_file" "etcd_service_template" {
+  count    = var.controller_instances
+  template = file("etcd/10-etcd.sh.tpl")
+
+  vars = {
+    etcd_name    = aws_instance.controller.*.public_dns[count.index]
+    internal_ip  = aws_instance.controller.*.private_ip[count.index]
+    etcd_version = var.etcd_version
   }
 }
+
+resource "local_file" "etcd_service" {
+  count = var.controller_instances
+
+  content  = data.template_file.etcd_service_template.*.rendered[count.index]
+  filename = "./etcd/controller${count.index}.10-etcd.sh"
+}
+
+resource "null_resource" "k8s_instance_etcd" {
+  count = var.controller_instances
+
+  connection {
+    type         = "ssh"
+    user         = "ec2-user"
+    host         = aws_instance.controller.*.private_ip[count.index]
+    bastion_host = aws_instance.bastion.public_ip
+  }
+
+  provisioner "file" {
+    source      = "./etcd/controller${count.index}.10-etcd.sh"
+    destination = "10-etcd.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo chmod +x 10-etcd.sh",
+      "sudo ./10-etcd.sh"
+      #"sudo ETCDCTL_API=3 etcdctl member list --endpoints=https://127.0.0.1:2379 --cacert=/etc/etcd/ca.pem --cert=/etc/etcd/kubernetes.pem --key=/etc/etcd/kubernetes-key.pem",
+    ]
+  }
+}
+#  part {
+#    filename     = "30-kubernetes.sh"
+#    content_type = "text/x-shellscript"
+#    content = templatefile("cloudinit/35-kubernetes.sh", {
+#      k8s_version          = var.k8s_version,
+#      cluster_service_ip   = var.cluster_service_ip,
+#      controller_instances = var.controller_instances,
+#      cluster_public_ip    = aws_instance.bastion.public_ip,
+#      # TODO: cycle dep resolven
+#      etcd_server_ips = "https://${join(":2379,https://", aws_instance.controller.*.private_ip)}:2379"
+#    })
+#  }
+#}
