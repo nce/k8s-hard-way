@@ -262,6 +262,34 @@ resource "tls_locally_signed_cert" "k8s_controller_manager" {
     "server_auth",
   ]
 }
+resource "local_file" "k8s_controller_manager_key" {
+  content  = tls_private_key.k8s_controller_manager.private_key_pem
+  filename = "./pki/controllermanager-key.pem"
+}
+resource "local_file" "k8s_controller_manager_cert" {
+  content  = tls_locally_signed_cert.k8s_controller_manager.cert_pem
+  filename = "./pki/controllermanager-cert.pem"
+}
+
+resource "null_resource" "k8s_controller_manager" {
+  count = var.controller_instances
+
+  connection {
+    type         = "ssh"
+    user         = "ec2-user"
+    host         = aws_instance.controller.*.private_ip[count.index]
+    bastion_host = aws_instance.bastion.public_ip
+  }
+
+  provisioner "file" {
+    source      = "./pki/controllermanager-key.pem"
+    destination = "controllermanager-key.pem"
+  }
+  provisioner "file" {
+    source      = "./pki/controllermanager-cert.pem"
+    destination = "controllermanager-cert.pem"
+  }
+}
 # -- [ controller_manager cert ] --
 # ---------------------------------
 
@@ -337,6 +365,36 @@ resource "tls_locally_signed_cert" "k8s_scheduler" {
     "server_auth",
   ]
 }
+
+resource "local_file" "k8s_scheduler_key" {
+  content  = tls_private_key.k8s_scheduler.private_key_pem
+  filename = "./pki/scheduler-key.pem"
+}
+resource "local_file" "k8s_scheduler_cert" {
+  content  = tls_locally_signed_cert.k8s_scheduler.cert_pem
+  filename = "./pki/scheduler-cert.pem"
+}
+
+resource "null_resource" "k8s_scheduler" {
+  count = var.controller_instances
+
+  connection {
+    type         = "ssh"
+    user         = "ec2-user"
+    host         = aws_instance.controller.*.private_ip[count.index]
+    bastion_host = aws_instance.bastion.public_ip
+  }
+
+  provisioner "file" {
+    source      = "./pki/scheduler-key.pem"
+    destination = "scheduler-key.pem"
+  }
+  provisioner "file" {
+    source      = "./pki/scheduler-cert.pem"
+    destination = "scheduler-cert.pem"
+  }
+}
+
 # -- [ scheduler cert ] --
 # ------------------------
 

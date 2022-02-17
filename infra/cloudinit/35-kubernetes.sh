@@ -10,6 +10,8 @@ chmod +x kube-apiserver kube-controller-manager kube-scheduler kubectl
 mv kube-apiserver kube-controller-manager kube-scheduler kubectl /usr/local/bin/
 
 mkdir -p /var/lib/kubernetes
+mkdir -p /etc/kubernetes/config
+
 # ca
 mv /home/ec2-user/ca-cert.pem /var/lib/kubernetes/ca.pem
 mv /home/ec2-user/ca-key.pem /var/lib/kubernetes/ca-key.pem
@@ -40,6 +42,27 @@ kubectl config set-context default \
 
 kubectl config use-context default --kubeconfig=kube-scheduler.kubeconfig
 mv kube-scheduler.kubeconfig /var/lib/kube-scheduler.kubeconfig
+
+# kube-controller-manager scheduler
+kubectl config set-cluster kubernetes-the-hard-way \
+  --certificate-authority=/var/lib/kubernetes/ca.pem \
+  --embed-certs=true \
+  --server=https://127.0.0.1:6443 \
+  --kubeconfig=kube-controller-manager.kubeconfig
+
+kubectl config set-credentials system:kube-controller-manager \
+  --client-certificate=kube-controller-manager.pem \
+  --client-key=kube-controller-manager-key.pem \
+  --embed-certs=true \
+  --kubeconfig=kube-controller-manager.kubeconfig
+
+kubectl config set-context default \
+  --cluster=kubernetes-the-hard-way \
+  --user=system:kube-controller-manager \
+  --kubeconfig=kube-controller-manager.kubeconfig
+
+kubectl config use-context default --kubeconfig=kube-controller-manager.kubeconfig
+mv kube-controller-manager.kubeconfig /var/lib/kube-controller-manager.kubeconfig
 
 cat <<EOF | sed "s/INTERNAL_IP/$(hostname -i)/" | sudo tee /etc/systemd/system/kube-apiserver.service
 [Unit]
@@ -110,3 +133,32 @@ RestartSec=5
 [Install]
 WantedBy=multi-user.target
 EOF
+
+cat <<EOF | sudo tee /etc/kubernetes/config/kube-scheduler.yaml
+apiVersion: kubescheduler.config.k8s.io/v1beta1
+kind: KubeSchedulerConfiguration
+clientConnection:
+  kubeconfig: "/var/lib/kubernetes/kube-scheduler.kubeconfig"
+leaderElection:
+  leaderElect: true
+EOF
+
+cat <<EOF | sudo tee /etc/systemd/system/kube-scheduler.service
+[Unit]
+Description=Kubernetes Scheduler
+Documentation=https://github.com/kubernetes/kubernetes
+
+[Service]
+ExecStart=/usr/local/bin/kube-scheduler \\
+  --config=/etc/kubernetes/config/kube-scheduler.yaml \\
+  --v=2
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable kube-apiserver kube-controller-manager kube-scheduler
+systemctl start kube-apiserver kube-controller-manager kube-scheduler

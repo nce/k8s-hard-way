@@ -44,15 +44,23 @@ data "cloudinit_config" "controller" {
     content      = file("cloudinit/20-crio.sh")
   }
   part {
+    filename     = "30-etcd.sh"
+    content_type = "text/x-shellscript"
+    content = templatefile("cloudinit/30-etcd.sh", {
+      etcd_version = var.etcd_version,
+    })
+  }
+
+  part {
     filename     = "30-kubernetes.sh"
     content_type = "text/x-shellscript"
-    content = templatefile("cloudinit/30-kubernetes.sh", {
+    content = templatefile("cloudinit/35-kubernetes.sh", {
       k8s_version          = var.k8s_version,
       cluster_service_ip   = var.cluster_service_ip,
       controller_instances = var.controller_instances,
       cluster_public_ip    = aws_instance.bastion.public_ip,
       # TODO: cycle dep resolven
-      etcd_server_ips = "https://${join(":2379,https://", ["1", "2", "3"])}:2379"
+      etcd_server_ips = "https://${join(":2379,https://", aws_instance.controller.*.private_ip)}:2379"
     })
   }
 }

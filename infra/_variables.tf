@@ -17,3 +17,7 @@ variable "cluster_service_ip" {
 variable "k8s_version" {
   type = string
 }
+
+variable "etcd_version" {
+  type = string
+}
