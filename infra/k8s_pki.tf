@@ -28,11 +28,11 @@ resource "tls_self_signed_cert" "k8s_ca" {
 
 resource "local_file" "k8s_ca_key" {
   content  = tls_private_key.k8s_ca.private_key_pem
-  filename = "./pki/ca-key.pem"
+  filename = "./pki/generated/ca-key.pem"
 }
 resource "local_file" "k8s_ca_cert" {
   content  = tls_self_signed_cert.k8s_ca.cert_pem
-  filename = "./pki/ca-cert.pem"
+  filename = "./pki/generated/ca-cert.pem"
 }
 
 resource "null_resource" "k8s_ca" {
@@ -46,11 +46,11 @@ resource "null_resource" "k8s_ca" {
   }
 
   provisioner "file" {
-    source      = "./pki/ca-key.pem"
+    source      = "./pki/generated/ca-key.pem"
     destination = "ca-key.pem"
   }
   provisioner "file" {
-    source      = "./pki/ca-cert.pem"
+    source      = "./pki/generated/ca-cert.pem"
     destination = "ca-cert.pem"
   }
 }
@@ -111,11 +111,11 @@ resource "tls_locally_signed_cert" "k8s_apiserver" {
 
 resource "local_file" "k8s_apiserver_key" {
   content  = tls_private_key.k8s_apiserver.private_key_pem
-  filename = "./pki/apiserver-key.pem"
+  filename = "./pki/generated/apiserver-key.pem"
 }
 resource "local_file" "k8s_apiserver_cert" {
   content  = tls_locally_signed_cert.k8s_apiserver.cert_pem
-  filename = "./pki/apiserver-cert.pem"
+  filename = "./pki/generated/apiserver-cert.pem"
 }
 
 resource "null_resource" "k8s_apiserver" {
@@ -129,11 +129,11 @@ resource "null_resource" "k8s_apiserver" {
   }
 
   provisioner "file" {
-    source      = "./pki/apiserver-key.pem"
+    source      = "./pki/generated/apiserver-key.pem"
     destination = "apiserver-key.pem"
   }
   provisioner "file" {
-    source      = "./pki/apiserver-cert.pem"
+    source      = "./pki/generated/apiserver-cert.pem"
     destination = "apiserver-cert.pem"
   }
 }
@@ -264,11 +264,11 @@ resource "tls_locally_signed_cert" "k8s_controller_manager" {
 }
 resource "local_file" "k8s_controller_manager_key" {
   content  = tls_private_key.k8s_controller_manager.private_key_pem
-  filename = "./pki/controllermanager-key.pem"
+  filename = "./pki/generated/controllermanager-key.pem"
 }
 resource "local_file" "k8s_controller_manager_cert" {
   content  = tls_locally_signed_cert.k8s_controller_manager.cert_pem
-  filename = "./pki/controllermanager-cert.pem"
+  filename = "./pki/generated/controllermanager-cert.pem"
 }
 
 resource "null_resource" "k8s_controller_manager" {
@@ -282,11 +282,11 @@ resource "null_resource" "k8s_controller_manager" {
   }
 
   provisioner "file" {
-    source      = "./pki/controllermanager-key.pem"
+    source      = "./pki/generated/controllermanager-key.pem"
     destination = "controllermanager-key.pem"
   }
   provisioner "file" {
-    source      = "./pki/controllermanager-cert.pem"
+    source      = "./pki/generated/controllermanager-cert.pem"
     destination = "controllermanager-cert.pem"
   }
 }
@@ -368,11 +368,11 @@ resource "tls_locally_signed_cert" "k8s_scheduler" {
 
 resource "local_file" "k8s_scheduler_key" {
   content  = tls_private_key.k8s_scheduler.private_key_pem
-  filename = "./pki/scheduler-key.pem"
+  filename = "./pki/generated/scheduler-key.pem"
 }
 resource "local_file" "k8s_scheduler_cert" {
   content  = tls_locally_signed_cert.k8s_scheduler.cert_pem
-  filename = "./pki/scheduler-cert.pem"
+  filename = "./pki/generated/scheduler-cert.pem"
 }
 
 resource "null_resource" "k8s_scheduler" {
@@ -386,11 +386,11 @@ resource "null_resource" "k8s_scheduler" {
   }
 
   provisioner "file" {
-    source      = "./pki/scheduler-key.pem"
+    source      = "./pki/generated/scheduler-key.pem"
     destination = "scheduler-key.pem"
   }
   provisioner "file" {
-    source      = "./pki/scheduler-cert.pem"
+    source      = "./pki/generated/scheduler-cert.pem"
     destination = "scheduler-cert.pem"
   }
 }
@@ -435,11 +435,11 @@ resource "tls_locally_signed_cert" "k8s_service_account" {
 
 resource "local_file" "k8s_service_account_key" {
   content  = tls_private_key.k8s_service_account.private_key_pem
-  filename = "./pki/serviceaccount-key.pem"
+  filename = "./pki/generated/serviceaccount-key.pem"
 }
 resource "local_file" "k8s_service_account_cert" {
   content  = tls_locally_signed_cert.k8s_service_account.cert_pem
-  filename = "./pki/serviceaccount-cert.pem"
+  filename = "./pki/generated/serviceaccount-cert.pem"
 }
 
 resource "null_resource" "k8s_service_account" {
@@ -453,11 +453,11 @@ resource "null_resource" "k8s_service_account" {
   }
 
   provisioner "file" {
-    source      = "./pki/serviceaccount-key.pem"
+    source      = "./pki/generated/serviceaccount-key.pem"
     destination = "serviceaccount-key.pem"
   }
   provisioner "file" {
-    source      = "./pki/serviceaccount-cert.pem"
+    source      = "./pki/generated/serviceaccount-cert.pem"
     destination = "serviceaccount-cert.pem"
   }
 }

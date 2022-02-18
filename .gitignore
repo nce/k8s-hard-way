@@ -1,5 +1,5 @@
 old/
-infra/pki/
+generated/
 # Local .terraform directories
 **/.terraform/*
 
