@@ -394,7 +394,6 @@ resource "null_resource" "k8s_scheduler" {
     destination = "scheduler-cert.pem"
   }
 }
-
 # -- [ scheduler cert ] --
 # ------------------------
 

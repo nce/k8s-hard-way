@@ -13,14 +13,14 @@ mkdir -p /var/lib/kubernetes
 mkdir -p /etc/kubernetes/config
 
 # ca
-mv /home/ec2-user/ca-cert.pem /var/lib/kubernetes/ca.pem
-mv /home/ec2-user/ca-key.pem /var/lib/kubernetes/ca-key.pem
+cp /home/ec2-user/ca-cert.pem /var/lib/kubernetes/ca.pem
+cp /home/ec2-user/ca-key.pem /var/lib/kubernetes/ca-key.pem
 # apiserver
-mv /home/ec2-user/apiserver-cert.pem /var/lib/kubernetes/kubernetes.pem
-mv /home/ec2-user/apiserver-key.pem /var/lib/kubernetes/kubernetes-key.pem
+cp /home/ec2-user/apiserver-cert.pem /var/lib/kubernetes/kubernetes.pem
+cp /home/ec2-user/apiserver-key.pem /var/lib/kubernetes/kubernetes-key.pem
 # serviceaccount
-mv /home/ec2-user/serviceaccount-cert.pem /var/lib/kubernetes/serviceaccount.pem
-mv /home/ec2-user/serviceaccount-key.pem /var/lib/kubernetes/serviceaccount-key.pem
+cp /home/ec2-user/serviceaccount-cert.pem /var/lib/kubernetes/serviceaccount.pem
+cp /home/ec2-user/serviceaccount-key.pem /var/lib/kubernetes/serviceaccount-key.pem
 
 # Kubeconfig scheduler
 kubectl config set-cluster kubernetes-the-hard-way \

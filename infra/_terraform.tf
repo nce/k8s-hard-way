@@ -7,9 +7,9 @@ terraform {
       version = "~> 2.2"
     }
     aws = {
-      source = "hashicorp/aws"
-      #version = "~> 4.0"
-      version = "< 4.0"
+      source  = "hashicorp/aws"
+      version = "~> 4.0"
+      #version = "< 4.0"
     }
     tls = {
       source  = "hashicorp/tls"
@@ -22,10 +22,6 @@ terraform {
     local = {
       source  = "hashicorp/local"
       version = "~> 2.1"
-    }
-    template = {
-      source  = "hashicorp/template"
-      version = "~> 2.2"
     }
   }
 }

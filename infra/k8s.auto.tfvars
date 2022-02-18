@@ -1,4 +1,4 @@
-controller_instances = 1
+controller_instances = 2
 worker_instances     = 0
 
 k8s_version  = "1.23.0"

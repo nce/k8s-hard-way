@@ -45,26 +45,23 @@ data "cloudinit_config" "controller" {
   }
 }
 
-data "template_file" "etcd_service_template" {
-  count    = var.controller_instances
-  template = file("etcd/10-etcd.sh.tpl")
-
-  vars = {
-    etcd_name    = aws_instance.controller.*.public_dns[count.index]
-    internal_ip  = aws_instance.controller.*.private_ip[count.index]
-    etcd_version = var.etcd_version
-  }
-}
-
 resource "local_file" "etcd_service" {
   count = var.controller_instances
 
-  content  = data.template_file.etcd_service_template.*.rendered[count.index]
+  content = templatefile("etcd/10-etcd.sh.tftpl", {
+    etcd_name    = aws_instance.controller.*.public_dns[count.index],
+    internal_ip  = aws_instance.controller.*.private_ip[count.index],
+    etcd_version = var.etcd_version
+    etcd_server  = join(",", [for k, v in zipmap(aws_instance.controller.*.public_dns, aws_instance.controller.*.private_ip) : "${k}=https://${v}:2380"])
+  })
+
   filename = "./etcd/controller${count.index}.10-etcd.sh"
 }
 
 resource "null_resource" "k8s_instance_etcd" {
   count = var.controller_instances
+
+  depends_on = [null_resource.k8s_ca, null_resource.k8s_apiserver]
 
   connection {
     type         = "ssh"
@@ -79,11 +76,14 @@ resource "null_resource" "k8s_instance_etcd" {
   }
 
   provisioner "remote-exec" {
+
+
     inline = [
       "sudo chmod +x 10-etcd.sh",
       "sudo ./10-etcd.sh"
       #"sudo ETCDCTL_API=3 etcdctl member list --endpoints=https://127.0.0.1:2379 --cacert=/etc/etcd/ca.pem --cert=/etc/etcd/kubernetes.pem --key=/etc/etcd/kubernetes-key.pem",
     ]
+
   }
 }
 #  part {
