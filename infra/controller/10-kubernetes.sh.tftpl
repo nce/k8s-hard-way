@@ -1,13 +1,18 @@
 #!/bin/bash
 set -xe
 
-curl -s -O "https://storage.googleapis.com/kubernetes-release/release/v${k8s_version}/bin/linux/amd64/kube-apiserver" \
-  -O "https://storage.googleapis.com/kubernetes-release/release/v${k8s_version}/bin/linux/amd64/kube-controller-manager" \
-  -O "https://storage.googleapis.com/kubernetes-release/release/v${k8s_version}/bin/linux/amd64/kube-scheduler" \
-  -O "https://storage.googleapis.com/kubernetes-release/release/v${k8s_version}/bin/linux/amd64/kubectl"
+if ! command -v /usr/local/bin/kubectl &> /dev/null; then
+  curl -s -O "https://storage.googleapis.com/kubernetes-release/release/v${k8s_version}/bin/linux/amd64/kube-apiserver" \
+    -O "https://storage.googleapis.com/kubernetes-release/release/v${k8s_version}/bin/linux/amd64/kube-controller-manager" \
+    -O "https://storage.googleapis.com/kubernetes-release/release/v${k8s_version}/bin/linux/amd64/kube-scheduler" \
+    -O "https://storage.googleapis.com/kubernetes-release/release/v${k8s_version}/bin/linux/amd64/kubectl"
 
-chmod +x kube-apiserver kube-controller-manager kube-scheduler kubectl
-mv kube-apiserver kube-controller-manager kube-scheduler kubectl /usr/local/bin/
+  chmod +x kube-apiserver kube-controller-manager kube-scheduler kubectl
+  mv kube-apiserver kube-controller-manager kube-scheduler kubectl /usr/local/bin/
+
+  semanage fcontext -a -t bin_t /usr/local/bin/kube* || true
+  restorecon -R -v /usr/local/bin
+fi
 
 mkdir -p /var/lib/kubernetes
 mkdir -p /etc/kubernetes/config
@@ -19,59 +24,60 @@ cp /home/ec2-user/ca-key.pem /var/lib/kubernetes/ca-key.pem
 cp /home/ec2-user/apiserver-cert.pem /var/lib/kubernetes/kubernetes.pem
 cp /home/ec2-user/apiserver-key.pem /var/lib/kubernetes/kubernetes-key.pem
 # serviceaccount
-cp /home/ec2-user/serviceaccount-cert.pem /var/lib/kubernetes/serviceaccount.pem
-cp /home/ec2-user/serviceaccount-key.pem /var/lib/kubernetes/serviceaccount-key.pem
+cp /home/ec2-user/serviceaccount-cert.pem /var/lib/kubernetes/service-account.pem
+cp /home/ec2-user/serviceaccount-key.pem /var/lib/kubernetes/service-account-key.pem
 
 # Kubeconfig scheduler
-kubectl config set-cluster kubernetes-the-hard-way \
+/usr/local/bin/kubectl config set-cluster kubernetes-the-hard-way \
   --certificate-authority=/var/lib/kubernetes/ca.pem \
   --embed-certs=true \
   --server=https://127.0.0.1:6443 \
   --kubeconfig=kube-scheduler.kubeconfig
 
-kubectl config set-credentials system:kube-scheduler \
-  --client-certificate=kube-scheduler.pem \
-  --client-key=kube-scheduler-key.pem \
+/usr/local/bin/kubectl config set-credentials system:kube-scheduler \
+  --client-certificate=scheduler-cert.pem \
+  --client-key=scheduler-key.pem \
   --embed-certs=true \
   --kubeconfig=kube-scheduler.kubeconfig
 
-kubectl config set-context default \
+/usr/local/bin/kubectl config set-context default \
   --cluster=kubernetes-the-hard-way \
   --user=system:kube-scheduler \
   --kubeconfig=kube-scheduler.kubeconfig
 
-kubectl config use-context default --kubeconfig=kube-scheduler.kubeconfig
+/usr/local/bin/kubectl config use-context default --kubeconfig=kube-scheduler.kubeconfig
 mv kube-scheduler.kubeconfig /var/lib/kube-scheduler.kubeconfig
 
 # kube-controller-manager scheduler
-kubectl config set-cluster kubernetes-the-hard-way \
+/usr/local/bin/kubectl config set-cluster kubernetes-the-hard-way \
   --certificate-authority=/var/lib/kubernetes/ca.pem \
   --embed-certs=true \
   --server=https://127.0.0.1:6443 \
   --kubeconfig=kube-controller-manager.kubeconfig
 
-kubectl config set-credentials system:kube-controller-manager \
-  --client-certificate=kube-controller-manager.pem \
-  --client-key=kube-controller-manager-key.pem \
+/usr/local/bin/kubectl config set-credentials system:kube-controller-manager \
+  --client-certificate=controllermanager-cert.pem \
+  --client-key=controllermanager-key.pem \
   --embed-certs=true \
   --kubeconfig=kube-controller-manager.kubeconfig
 
-kubectl config set-context default \
+/usr/local/bin/kubectl config set-context default \
   --cluster=kubernetes-the-hard-way \
   --user=system:kube-controller-manager \
   --kubeconfig=kube-controller-manager.kubeconfig
 
-kubectl config use-context default --kubeconfig=kube-controller-manager.kubeconfig
+/usr/local/bin/kubectl config use-context default --kubeconfig=kube-controller-manager.kubeconfig
 mv kube-controller-manager.kubeconfig /var/lib/kube-controller-manager.kubeconfig
 
-cat <<EOF | sed "s/INTERNAL_IP/$(hostname -i)/" | sudo tee /etc/systemd/system/kube-apiserver.service
+cat <<EOF | sudo tee /etc/systemd/system/kube-apiserver.service
 [Unit]
 Description=Kubernetes API Server
 Documentation=https://github.com/kubernetes/kubernetes
 
 [Service]
+User=kubernetes
 ExecStart=/usr/local/bin/kube-apiserver \\
-  --advertise-address=INTERNAL_IP \\
+  --advertise-address=$(hostname -i) \\
   --allow-privileged=true \\
   --apiserver-count=${controller_instances} \\
   --audit-log-maxage=30 \\
@@ -85,7 +91,7 @@ ExecStart=/usr/local/bin/kube-apiserver \\
   --etcd-cafile=/var/lib/kubernetes/ca.pem \\
   --etcd-certfile=/var/lib/kubernetes/kubernetes.pem \\
   --etcd-keyfile=/var/lib/kubernetes/kubernetes-key.pem \\
-  --etcd-servers=${etcd_server_ips} \\
+  --etcd-servers=${etcd_server} \\
   --event-ttl=1h \\
   --encryption-provider-config=/var/lib/kubernetes/encryption-config.yaml \\
   --kubelet-certificate-authority=/var/lib/kubernetes/ca.pem \\
@@ -114,6 +120,7 @@ Description=Kubernetes Controller Manager
 Documentation=https://github.com/kubernetes/kubernetes
 
 [Service]
+User=kubernetes
 ExecStart=/usr/local/bin/kube-controller-manager \\
   --bind-address=0.0.0.0 \\
   --cluster-cidr=10.200.0.0/16 \\
@@ -149,6 +156,7 @@ Description=Kubernetes Scheduler
 Documentation=https://github.com/kubernetes/kubernetes
 
 [Service]
+User=kubernetes
 ExecStart=/usr/local/bin/kube-scheduler \\
   --config=/etc/kubernetes/config/kube-scheduler.yaml \\
   --v=2
