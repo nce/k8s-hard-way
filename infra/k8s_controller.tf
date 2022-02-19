@@ -28,6 +28,7 @@ resource "null_resource" "k8s_instance_controller" {
     null_resource.k8s_service_account,
     null_resource.k8s_controller_manager,
     null_resource.k8s_scheduler,
+    null_resource.k8s_admin,
     local_file.k8s_service,
   ]
 

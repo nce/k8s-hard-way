@@ -69,6 +69,24 @@ mv kube-scheduler.kubeconfig /var/lib/kubernetes/kube-scheduler.kubeconfig
 /usr/local/bin/kubectl config use-context default --kubeconfig=kube-controller-manager.kubeconfig
 mv kube-controller-manager.kubeconfig /var/lib/kubernetes/kube-controller-manager.kubeconfig
 
+/usr/local/bin/kubectl config set-cluster kubernetes-the-hard-way \
+  --certificate-authority=ca-cert.pem \
+  --embed-certs=true \
+  --server=https://127.0.0.1:6443 \
+  --kubeconfig=admin.kubeconfig
+
+/usr/local/bin/kubectl config set-credentials admin \
+  --client-certificate=admin-cert.pem \
+  --client-key=admin-key.pem \
+  --embed-certs=true \
+  --kubeconfig=admin.kubeconfig
+
+/usr/local/bin/kubectl config set-context default \
+  --cluster=kubernetes-the-hard-way \
+  --user=admin \
+  --kubeconfig=admin.kubeconfig
+
+/usr/local/bin/kubectl config use-context default --kubeconfig=admin.kubeconfig
 
 cat <<EOF | sudo tee /var/lib/kubernetes/encryption-config.yaml
 kind: EncryptionConfig

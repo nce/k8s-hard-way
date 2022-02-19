@@ -175,6 +175,34 @@ resource "tls_locally_signed_cert" "k8s_admin" {
     "server_auth",
   ]
 }
+resource "local_file" "k8s_admin_key" {
+  content  = tls_private_key.k8s_admin.private_key_pem
+  filename = "./pki/generated/admin-key.pem"
+}
+resource "local_file" "k8s_admin_cert" {
+  content  = tls_locally_signed_cert.k8s_admin.cert_pem
+  filename = "./pki/generated/admin-cert.pem"
+}
+
+resource "null_resource" "k8s_admin" {
+  count = var.controller_instances
+
+  connection {
+    type         = "ssh"
+    user         = "ec2-user"
+    host         = aws_instance.controller.*.private_ip[count.index]
+    bastion_host = aws_instance.bastion.public_ip
+  }
+
+  provisioner "file" {
+    source      = "./pki/generated/admin-key.pem"
+    destination = "admin-key.pem"
+  }
+  provisioner "file" {
+    source      = "./pki/generated/admin-cert.pem"
+    destination = "admin-cert.pem"
+  }
+}
 # -- [ admin cert ] --
 # --------------------
 
