@@ -46,9 +46,9 @@ cp /home/ec2-user/serviceaccount-key.pem /var/lib/kubernetes/service-account-key
   --kubeconfig=kube-scheduler.kubeconfig
 
 /usr/local/bin/kubectl config use-context default --kubeconfig=kube-scheduler.kubeconfig
-mv kube-scheduler.kubeconfig /var/lib/kube-scheduler.kubeconfig
+mv kube-scheduler.kubeconfig /var/lib/kubernetes/kube-scheduler.kubeconfig
 
-# kube-controller-manager scheduler
+# kube-controller-manager
 /usr/local/bin/kubectl config set-cluster kubernetes-the-hard-way \
   --certificate-authority=/var/lib/kubernetes/ca.pem \
   --embed-certs=true \
@@ -82,6 +82,15 @@ resources:
             - name: key1
               secret: ${encryption_key}
       - identity: {}
+EOF
+
+cat <<EOF | sudo tee /etc/kubernetes/config/kube-scheduler.yaml
+apiVersion: kubescheduler.config.k8s.io/v1beta2
+kind: KubeSchedulerConfiguration
+clientConnection:
+  kubeconfig: "/var/lib/kubernetes/kube-scheduler.kubeconfig"
+leaderElection:
+  leaderElect: true
 EOF
 
 cat <<EOF | sudo tee /etc/systemd/system/kube-apiserver.service
