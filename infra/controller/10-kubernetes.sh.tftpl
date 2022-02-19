@@ -67,7 +67,7 @@ mv kube-scheduler.kubeconfig /var/lib/kube-scheduler.kubeconfig
   --kubeconfig=kube-controller-manager.kubeconfig
 
 /usr/local/bin/kubectl config use-context default --kubeconfig=kube-controller-manager.kubeconfig
-mv kube-controller-manager.kubeconfig /var/lib/kube-controller-manager.kubeconfig
+mv kube-controller-manager.kubeconfig /var/lib/kubernetes/kube-controller-manager.kubeconfig
 
 
 cat <<EOF | sudo tee /var/lib/kubernetes/encryption-config.yaml
@@ -98,7 +98,7 @@ ExecStart=/usr/local/bin/kube-apiserver \\
   --audit-log-maxage=30 \\
   --audit-log-maxbackup=3 \\
   --audit-log-maxsize=100 \\
-  --audit-log-path=/var/log/audit.log \\
+  --audit-log-path=/var/lib/kubernetes/audit.log \\
   --authorization-mode=Node,RBAC \\
   --bind-address=0.0.0.0 \\
   --client-ca-file=/var/lib/kubernetes/ca.pem \\
@@ -181,6 +181,9 @@ RestartSec=5
 [Install]
 WantedBy=multi-user.target
 EOF
+
+chown -R kubernetes. /var/lib/kubernetes
+chown -R kubernetes. /etc/kubernetes/config
 
 systemctl daemon-reload
 systemctl enable kube-apiserver kube-controller-manager kube-scheduler
