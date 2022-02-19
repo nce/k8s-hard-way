@@ -1,3 +1,7 @@
+resource "random_id" "etcd_encryption_key" {
+  byte_length = 32
+}
+
 resource "local_file" "k8s_service" {
   count = var.controller_instances
 
@@ -7,6 +11,7 @@ resource "local_file" "k8s_service" {
     etcd_server          = "https://${join(":2379,https://", aws_instance.controller.*.private_ip)}:2379"
     cluster_public_ip    = aws_instance.bastion.public_ip
     cluster_service_ip   = var.cluster_service_ip
+    encryption_key       = random_id.etcd_encryption_key.b64_std
   })
 
   filename = "./controller/generated/controller${count.index}.10-kubernetes.sh"

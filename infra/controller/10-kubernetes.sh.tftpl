@@ -69,6 +69,21 @@ mv kube-scheduler.kubeconfig /var/lib/kube-scheduler.kubeconfig
 /usr/local/bin/kubectl config use-context default --kubeconfig=kube-controller-manager.kubeconfig
 mv kube-controller-manager.kubeconfig /var/lib/kube-controller-manager.kubeconfig
 
+
+cat <<EOF | sudo tee /var/lib/kubernetes/encryption-config.yaml
+kind: EncryptionConfig
+apiVersion: v1
+resources:
+  - resources:
+      - secrets
+    providers:
+      - aescbc:
+          keys:
+            - name: key1
+              secret: ${encryption_key}
+      - identity: {}
+EOF
+
 cat <<EOF | sudo tee /etc/systemd/system/kube-apiserver.service
 [Unit]
 Description=Kubernetes API Server
