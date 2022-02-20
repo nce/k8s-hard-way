@@ -1,5 +1,5 @@
 controller_instances = 2
-worker_instances     = 0
+worker_instances     = 1
 
 k8s_version  = "1.23.0"
 etcd_version = "3.5.2"

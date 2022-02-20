@@ -1,4 +1,3 @@
-
 resource "aws_security_group" "controller" {
   vpc_id = aws_vpc.vpc.id
 
@@ -82,6 +81,58 @@ resource "aws_security_group" "bastion" {
     from_port        = 0
     to_port          = 0
     protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+}
+
+resource "aws_security_group" "worker" {
+  vpc_id = aws_vpc.vpc.id
+
+  dynamic "ingress" {
+    # https://www.weave.works/docs/net/latest/faq/
+    for_each = {
+      6781 : { protocol : "tcp", description : "weave metrics" },
+      6782 : { protocol : "tcp", description : "weave metrics" },
+      6783 : { protocol : "tcp", description : "weave control" },
+      6783 : { protocol : "udp", description : "weave control" },
+      6784 : { protocol : "udp", description : "weave control" },
+      22 : { protocol : "tcp", description : "ssh" },
+      10250 : { protocol : "tcp", description : "kubelet api" },
+    }
+
+    content {
+      description = ingress.value.description
+
+      from_port = ingress.key
+      protocol  = ingress.value.protocol
+      to_port   = ingress.value.protocol == "icmp" ? 0 : ingress.key
+
+      self = true
+    }
+  }
+
+  ingress {
+    from_port = 30000
+    protocol  = "tcp"
+    to_port   = 32767
+
+    self = true
+  }
+
+  ingress {
+    from_port = 0
+    protocol  = "-1"
+    to_port   = 0
+
+    security_groups = [aws_security_group.bastion.id]
+  }
+
+  egress {
+    from_port = 0
+    protocol  = "-1"
+    to_port   = 0
+
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
   }
