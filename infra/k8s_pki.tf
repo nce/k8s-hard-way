@@ -99,7 +99,8 @@ resource "tls_cert_request" "k8s_apiserver" {
     # cluster service
     var.cluster_service_ip,
     # public api
-    aws_instance.bastion.public_ip
+    aws_instance.bastion.public_ip,
+    aws_instance.bastion.private_ip,
     ],
     # controller ips
     aws_instance.controller.*.private_ip
