@@ -1,25 +1,34 @@
 #!/bin/bash
 set -xe
 
-if ! command -v /usr/local/bin/kubectl &> /dev/null; then
-  curl -s -O "https://storage.googleapis.com/kubernetes-release/release/v${k8s_version}/bin/linux/amd64/kube-apiserver" \
-    -O "https://storage.googleapis.com/kubernetes-release/release/v${k8s_version}/bin/linux/amd64/kube-controller-manager" \
-    -O "https://storage.googleapis.com/kubernetes-release/release/v${k8s_version}/bin/linux/amd64/kube-scheduler" \
-    -O "https://storage.googleapis.com/kubernetes-release/release/v${k8s_version}/bin/linux/amd64/kubectl"
+if ! command -v /usr/local/bin/kube-apiserver &> /dev/null; then
+  curl -s -O "https://storage.googleapis.com/kubernetes-release/release/v${k8s_version}/bin/linux/amd64/kube-apiserver"
 
-  chmod +x kube-apiserver kube-controller-manager kube-scheduler kubectl
-  mv kube-apiserver kube-controller-manager kube-scheduler kubectl /usr/local/bin/
+  chmod +x kube-apiserver
+  mv kube-apiserver /usr/local/bin/
 
-  semanage fcontext -a -t bin_t /usr/local/bin/kube* || true
+  semanage fcontext -a -t bin_t /usr/local/bin/kube-apiserver || true
+  restorecon -R -v /usr/local/bin
+fi
+
+if ! command -v /usr/local/bin/kube-controller-manager &> /dev/null; then
+  curl -s -O "https://storage.googleapis.com/kubernetes-release/release/v${k8s_version}/bin/linux/amd64/kube-controller-manager"
+
+  chmod +x kube-controller-manager
+  mv kube-controller-manager /usr/local/bin/
+
+  semanage fcontext -a -t bin_t /usr/local/bin/kube-controller-manager || true
   restorecon -R -v /usr/local/bin
 fi
 
 mkdir -p /var/lib/kubernetes
-mkdir -p /etc/kubernetes/config
 
 # ca
 cp /home/ec2-user/ca-cert.pem /var/lib/kubernetes/ca.pem
 cp /home/ec2-user/ca-key.pem /var/lib/kubernetes/ca-key.pem
+# serviceaccount
+cp /home/ec2-user/serviceaccount-cert.pem /var/lib/kubernetes/service-account.pem
+cp /home/ec2-user/serviceaccount-key.pem /var/lib/kubernetes/service-account-key.pem
 
 # kube-controller-manager
 /usr/local/bin/kubectl config set-cluster kubernetes-the-hard-way \
@@ -42,24 +51,6 @@ cp /home/ec2-user/ca-key.pem /var/lib/kubernetes/ca-key.pem
 /usr/local/bin/kubectl config use-context default --kubeconfig=kube-controller-manager.kubeconfig
 mv kube-controller-manager.kubeconfig /var/lib/kubernetes/kube-controller-manager.kubeconfig
 
-/usr/local/bin/kubectl config set-cluster kubernetes-the-hard-way \
-  --certificate-authority=ca-cert.pem \
-  --embed-certs=true \
-  --server=https://127.0.0.1:6443 \
-  --kubeconfig=admin.kubeconfig
-
-/usr/local/bin/kubectl config set-credentials admin \
-  --client-certificate=admin-cert.pem \
-  --client-key=admin-key.pem \
-  --embed-certs=true \
-  --kubeconfig=admin.kubeconfig
-
-/usr/local/bin/kubectl config set-context default \
-  --cluster=kubernetes-the-hard-way \
-  --user=admin \
-  --kubeconfig=admin.kubeconfig
-
-/usr/local/bin/kubectl config use-context default --kubeconfig=admin.kubeconfig
 
 cat <<EOF | sudo tee /etc/systemd/system/kube-controller-manager.service
 [Unit]
@@ -70,7 +61,7 @@ Documentation=https://github.com/kubernetes/kubernetes
 User=kubernetes
 ExecStart=/usr/local/bin/kube-controller-manager \\
   --bind-address=0.0.0.0 \\
-  --cluster-cidr=10.200.0.0/16 \\
+  --cluster-cidr=${cluster_cidr} \\
   --cluster-name=kubernetes \\
   --cluster-signing-cert-file=/var/lib/kubernetes/ca.pem \\
   --cluster-signing-key-file=/var/lib/kubernetes/ca-key.pem \\
@@ -88,9 +79,6 @@ RestartSec=5
 WantedBy=multi-user.target
 EOF
 
-chown -R kubernetes. /var/lib/kubernetes
-chown -R kubernetes. /etc/kubernetes/config
-
 systemctl daemon-reload
-systemctl enable  kube-controller-manager kube-scheduler
-systemctl start  kube-controller-manager kube-scheduler
+systemctl enable kube-controller-manager
+systemctl restart kube-controller-manager

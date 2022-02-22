@@ -75,6 +75,7 @@ WantedBy=multi-user.target
 EOF
 
 chown -R kubernetes. /etc/kubernetes/config
+chown -R kubernetes. /var/lib/kubernetes/
 
 systemctl daemon-reload
 systemctl enable kube-scheduler
