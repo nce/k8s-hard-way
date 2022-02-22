@@ -37,16 +37,16 @@ mkdir -p /var/lib/kubelet
 mkdir -p /var/lib/kube-proxy
 
 cp /home/ec2-user/ca-cert.pem /var/lib/kubernetes/ca.pem
-cp /home/ec2-user/kubelet-cert.pem /var/lib/kubernetes/kubelet.pem
-cp /home/ec2-user/kubelet-key.pem /var/lib/kubernetes/kubelet-key.pem
+cp /home/ec2-user/kubelet-cert.pem /var/lib/kubelet/kubelet.pem
+cp /home/ec2-user/kubelet-key.pem /var/lib/kubelet/kubelet-key.pem
 cp /home/ec2-user/proxy-cert.pem /var/lib/kubernetes/proxy.pem
 cp /home/ec2-user/proxy-key.pem /var/lib/kubernetes/proxy-key.pem
 
 /usr/local/bin/kubectl config set-cluster kubernetes-the-hard-way \
   --certificate-authority=ca-cert.pem \
   --embed-certs=true \
-  --server=https://${cluster_public_ip}:6443 \
-  --kubeconfig=kublet.kubeconfig
+  --server=https://${cluster_private_ip}:6443 \
+  --kubeconfig=kubelet.kubeconfig
 
 /usr/local/bin/kubectl config set-credentials system:node:$(hostname) \
   --client-certificate=kubelet-cert.pem \
@@ -60,12 +60,12 @@ cp /home/ec2-user/proxy-key.pem /var/lib/kubernetes/proxy-key.pem
   --kubeconfig=kubelet.kubeconfig
 
 /usr/local/bin/kubectl config use-context default --kubeconfig=kubelet.kubeconfig
-mv kubelet.kubeconfig /var/lib/kubernetes/
+mv kubelet.kubeconfig /var/lib/kubelet/
 
 /usr/local/bin/kubectl config set-cluster kubernetes-the-hard-way \
   --certificate-authority=ca-cert.pem \
   --embed-certs=true \
-  --server=https://${cluster_public_ip}:6443 \
+  --server=https://${cluster_private_ip}:6443 \
   --kubeconfig=kube-proxy.kubeconfig
 
 /usr/local/bin/kubectl config set-credentials system:kube-proxy \
