@@ -1,15 +1,6 @@
 #!/bin/bash
 set -xe
 
-if ! command -v /usr/local/bin/kubectl &> /dev/null; then
-  curl -s -O "https://storage.googleapis.com/kubernetes-release/release/v${k8s_version}/bin/linux/amd64//kubectl"
-  chmod +x kubectl
-  mv kubectl /usr/local/bin/
-
-  semanage fcontext -a -t bin_t /usr/local/bin/kubectl || true
-  restorecon -R -v /usr/local/bin
-fi
-
 if ! command -v /usr/local/bin/kube-apiserver &> /dev/null; then
   curl -s -O "https://storage.googleapis.com/kubernetes-release/release/v${k8s_version}/bin/linux/amd64/kube-apiserver"
 

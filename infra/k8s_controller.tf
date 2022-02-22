@@ -100,3 +100,46 @@ resource "null_resource" "k8s_instance_controller_apiserver" {
     ]
   }
 }
+
+resource "local_file" "k8s_kube_scheduler" {
+  count = var.controller_instances
+
+  content = templatefile("kube-scheduler/kube-scheduler.sh.tftpl", {
+    k8s_version        = var.k8s_version
+    cluster_private_ip = aws_instance.bastion.private_ip
+  })
+
+  filename = "./kube-scheduler/generated/controller${count.index}.kube-scheduler.sh"
+
+  depends_on = [aws_instance.controller]
+}
+
+resource "null_resource" "k8s_instance_controller_kube_scheduler" {
+  count = var.controller_instances
+
+  depends_on = [
+    null_resource.k8s_ca,
+    null_resource.k8s_scheduler,
+    local_file.k8s_kube_scheduler,
+  ]
+
+  connection {
+    type         = "ssh"
+    user         = "ec2-user"
+    host         = aws_instance.controller.*.private_ip[count.index]
+    bastion_host = aws_instance.bastion.public_ip
+  }
+
+  provisioner "file" {
+    source      = "./kube-scheduler/generated/controller${count.index}.kube-scheduler.sh"
+    destination = "kube-scheduler.sh"
+  }
+
+  provisioner "remote-exec" {
+
+    inline = [
+      "sudo chmod +x kube-scheduler.sh",
+      "sudo ./kube-scheduler.sh"
+    ]
+  }
+}
