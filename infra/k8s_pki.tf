@@ -236,6 +236,9 @@ resource "tls_cert_request" "k8s_kubelet" {
   key_algorithm   = tls_private_key.k8s_kubelet.*.algorithm[count.index]
   private_key_pem = tls_private_key.k8s_kubelet.*.private_key_pem[count.index]
 
+  dns_names = [
+    aws_instance.worker.*.private_dns[count.index]
+  ]
   ip_addresses = [
     aws_instance.worker.*.private_ip[count.index]
   ]
