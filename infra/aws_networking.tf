@@ -55,3 +55,11 @@ resource "aws_subnet" "subnet" {
   availability_zone = each.key
   cidr_block        = cidrsubnet(aws_vpc.vpc.cidr_block, 4, var.az_mapping[each.value.name_suffix])
 }
+
+resource "aws_route" "pod_routing" {
+  count = var.worker_instances
+
+  route_table_id         = aws_vpc.vpc.default_route_table_id
+  destination_cidr_block = "10.200.${count.index}.0/24"
+  network_interface_id   = aws_instance.worker[count.index].primary_network_interface_id
+}
