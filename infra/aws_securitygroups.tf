@@ -108,6 +108,7 @@ resource "aws_security_group" "worker" {
       6783 : { protocol : "udp", description : "weave control" },
       6784 : { protocol : "udp", description : "weave control" },
       22 : { protocol : "tcp", description : "ssh" },
+      10249 : { protocol : "tcp", description : "kube-proxy" },
       10250 : { protocol : "tcp", description : "kubelet api" },
     }
 
@@ -118,7 +119,8 @@ resource "aws_security_group" "worker" {
       protocol  = ingress.value.protocol
       to_port   = ingress.value.protocol == "icmp" ? 0 : ingress.key
 
-      self = true
+      security_groups = [aws_security_group.controller.id]
+
     }
   }
 
