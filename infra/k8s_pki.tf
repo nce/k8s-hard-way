@@ -79,7 +79,7 @@ resource "tls_cert_request" "k8s_apiserver" {
   private_key_pem = tls_private_key.k8s_apiserver.private_key_pem
 
   subject {
-    common_name         = "Kubernetes"
+    common_name         = "kubernetes"
     organization        = "nce ACME"
     country             = "DE"
     locality            = "Bavaria"
