@@ -1,3 +1,13 @@
+resource "aws_security_group_rule" "k8sapi" {
+  type      = "ingress"
+  from_port = 6443
+  to_port   = 6443
+  protocol  = "tcp"
+
+  security_group_id        = aws_security_group.controller.id
+  source_security_group_id = aws_security_group.worker.id
+}
+
 resource "aws_security_group" "controller" {
   vpc_id = aws_vpc.vpc.id
 
@@ -26,7 +36,6 @@ resource "aws_security_group" "controller" {
     # https://kubernetes.io/docs/reference/ports-and-protocols/
     for_each = {
       22 : { protocol : "tcp", description : "ssh" },
-      6443 : { protocol : "tcp", description : "apiserver" },
       2379 : { protocol : "tcp", description : "etcd apiserver" },
       2380 : { protocol : "tcp", description : "etcd" },
       10250 : { protocol : "tcp", description : "kubelet api" },
