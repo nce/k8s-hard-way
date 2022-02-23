@@ -62,6 +62,7 @@ ExecStart=/usr/local/bin/kubelet \\
   --container-runtime-endpoint=unix:///var/run/crio/crio.sock \\
   --image-pull-progress-deadline=2m \\
   --kubeconfig=/var/lib/kubelet/kubelet.kubeconfig \\
+  --cgroup-driver="systemd" \\
   --network-plugin=cni \\
   --register-node=true \\
   --v=2
@@ -88,7 +89,6 @@ clusterDomain: "cluster.local"
 clusterDNS:
   - "10.32.0.10"
 podCIDR: "${pod_cidr}"
-resolvConf: "/run/systemd/resolve/resolv.conf"
 runtimeRequestTimeout: "15m"
 tlsCertFile: "/var/lib/kubelet/kubelet.pem"
 tlsPrivateKeyFile: "/var/lib/kubelet/kubelet-key.pem"
