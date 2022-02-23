@@ -22,6 +22,14 @@ variable "k8s_version" {
   type = string
 }
 
+variable "crio_version" {
+  type = string
+}
+
 variable "etcd_version" {
+  type = string
+}
+
+variable "cluster_pod_cidr" {
   type = string
 }

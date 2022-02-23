@@ -98,7 +98,7 @@ resource "local_file" "k8s_kube_controller_manager" {
 
   content = templatefile("kube-controller-manager/kube-controller-manager.sh.tftpl", {
     k8s_version        = var.k8s_version
-    cluster_cidr       = "10.200.0.0/16"
+    cluster_cidr       = var.cluster_pod_cidr
     cluster_service_ip = var.cluster_service_ip
   })
 

@@ -4,7 +4,7 @@ resource "local_file" "k8s_worker_kubelet" {
   content = templatefile("kubelet/kubelet.sh.tftpl", {
     k8s_version        = var.k8s_version
     cluster_private_ip = aws_instance.bastion.private_ip
-    pod_cidr           = "10.200.0.0/16"
+    pod_cidr           = "10.200.${count.index}.0/24"
   })
 
   filename = "./kubelet/generated/worker${count.index}-kubelet.sh"
