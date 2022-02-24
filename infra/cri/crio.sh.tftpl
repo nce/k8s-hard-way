@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -xeuo pipefail
+
+if ! command -v crio &> /dev/null; then
+
+  curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/CentOS_8/devel:kubic:libcontainers:stable.repo
+  curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:${crio_version}.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:${crio_version}/CentOS_8/devel:kubic:libcontainers:stable:cri-o:${crio_version}.repo
+
+  yum install cri-o -y
+fi
+
+systemctl daemon-reload
+systemctl enable --now crio
+systemctl restart crio

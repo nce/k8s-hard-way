@@ -1,3 +1,40 @@
+resource "local_file" "k8s_worker_cri" {
+  content = templatefile("cri/crio.sh.tftpl", {
+    k8s_version = var.k8s_version
+  })
+
+  filename = "./crio/generated/crio.sh"
+
+  depends_on = [aws_instance.worker]
+}
+resource "null_resource" "k8s_instance_worker_cri" {
+  count = var.worker_instances
+
+  depends_on = [
+    local_file.k8s_worker_cri,
+  ]
+
+  connection {
+    type         = "ssh"
+    user         = "ec2-user"
+    host         = aws_instance.worker.*.private_ip[count.index]
+    bastion_host = aws_instance.bastion.public_ip
+  }
+
+  provisioner "file" {
+    source      = "./crio/generated/crio.sh"
+    destination = "crio.sh"
+  }
+
+  provisioner "remote-exec" {
+
+    inline = [
+      "sudo chmod +x crio.sh",
+      "sudo ./crio.sh"
+    ]
+  }
+}
+
 resource "local_file" "k8s_worker_kubelet" {
   count = var.worker_instances
 
@@ -9,7 +46,10 @@ resource "local_file" "k8s_worker_kubelet" {
 
   filename = "./kubelet/generated/worker${count.index}-kubelet.sh"
 
-  depends_on = [aws_instance.worker]
+  depends_on = [
+    null_resource.k8s_instance_worker_cri,
+    aws_instance.worker
+  ]
 }
 
 resource "null_resource" "k8s_instance_worker" {
@@ -54,7 +94,10 @@ resource "local_file" "k8s_worker_proxy" {
 
   filename = "./kube-proxy/generated/worker${count.index}-kube-proxy.sh"
 
-  depends_on = [aws_instance.worker]
+  depends_on = [
+    aws_instance.worker,
+    null_resource.k8s_instance_worker_cri,
+  ]
 }
 
 resource "null_resource" "k8s_instance_worker_proxy" {
@@ -87,3 +130,6 @@ resource "null_resource" "k8s_instance_worker_proxy" {
     ]
   }
 }
+
+
+
