@@ -1,5 +1,5 @@
 #!/bin/bash
-set -xe
+set -xeuo pipefail
 
 if ! command -v nginx &> /dev/null; then
   yum -y install nginx

@@ -1,7 +1,7 @@
 resource "local_file" "etcd_service" {
   count = var.controller_instances
 
-  content = templatefile("etcd/10-etcd.sh.tftpl", {
+  content = templatefile("etcd/etcd.sh.tftpl", {
     etcd_name    = aws_instance.controller.*.public_dns[count.index],
     internal_ip  = aws_instance.controller.*.private_ip[count.index],
     etcd_version = var.etcd_version
@@ -11,7 +11,7 @@ resource "local_file" "etcd_service" {
     ])
   })
 
-  filename = "./etcd/generated/controller${count.index}.10-etcd.sh"
+  filename = "./etcd/generated/controller${count.index}.etcd.sh"
 
   depends_on = [aws_instance.controller]
 }
@@ -33,15 +33,15 @@ resource "null_resource" "k8s_instance_etcd" {
   }
 
   provisioner "file" {
-    source      = "./etcd/generated/controller${count.index}.10-etcd.sh"
-    destination = "10-etcd.sh"
+    source      = "./etcd/generated/controller${count.index}.etcd.sh"
+    destination = "etcd.sh"
   }
 
   provisioner "remote-exec" {
 
     inline = [
-      "sudo chmod +x 10-etcd.sh",
-      "sudo ./10-etcd.sh"
+      "sudo chmod +x etcd.sh",
+      "sudo ./etcd.sh"
     ]
   }
 }

@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -exuo pipefail
 
 if ! command -v etcd &> /dev/null; then
 
@@ -61,4 +61,4 @@ EOF
 
 systemctl daemon-reload
 systemctl enable etcd
-systemctl start etcd
+systemctl restart etcd

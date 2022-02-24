@@ -38,24 +38,5 @@ data "cloudinit_config" "controller" {
     content_type = "text/x-shellscript"
     content      = file("cloudinit/10-baseos.sh")
   }
-  part {
-    filename     = "20-crio.sh"
-    content_type = "text/x-shellscript"
-    content      = file("cloudinit/20-crio.sh")
-  }
+
 }
-
-
-#  part {
-#    filename     = "30-kubernetes.sh"
-#    content_type = "text/x-shellscript"
-#    content = templatefile("cloudinit/35-kubernetes.sh", {
-#      k8s_version          = var.k8s_version,
-#      cluster_service_ip   = var.cluster_service_ip,
-#      controller_instances = var.controller_instances,
-#      cluster_public_ip    = aws_instance.bastion.public_ip,
-#      # TODO: cycle dep resolven
-#      etcd_server_ips = "https://${join(":2379,https://", aws_instance.controller.*.private_ip)}:2379"
-#    })
-#  }
-#}

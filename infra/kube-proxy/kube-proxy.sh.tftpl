@@ -1,5 +1,5 @@
-#!/bin/bash
-set -xe
+#!/usr/bin/env bash
+set -xeuo pipefail
 
 if ! command -v iptables &> /dev/null; then
   yum -y install iptables
@@ -76,6 +76,4 @@ EOF
 systemctl daemon-reload
 systemctl enable kube-proxy
 systemctl restart  kube-proxy
-
-
 

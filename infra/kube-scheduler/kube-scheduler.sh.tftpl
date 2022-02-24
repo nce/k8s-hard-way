@@ -1,5 +1,5 @@
-#!/bin/bash
-set -xe
+#!/usr/bin/env bash
+set -xeuo pipefail
 
 if ! command -v /usr/local/bin/kubectl &> /dev/null; then
   curl -s -O "https://storage.googleapis.com/kubernetes-release/release/v${k8s_version}/bin/linux/amd64//kubectl"

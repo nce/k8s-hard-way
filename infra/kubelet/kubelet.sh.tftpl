@@ -1,5 +1,21 @@
-#!/bin/bash
-set -xe
+#!/usr/bin/env bash
+set -xeuo pipefail
+
+cat <<EOF | tee /etc/modules-load.d/k8s.conf
+  br_netfilter
+  overlay
+EOF
+
+modprobe br_netfilter
+modprobe overlay
+
+cat <<EOF | tee /etc/sysctl.d/k8s.conf
+  net.bridge.bridge-nf-call-ip6tables = 1
+  net.ipv4.ip_forward                 = 1
+  net.bridge.bridge-nf-call-iptables = 1
+EOF
+sysctl --system
+swapoff -a
 
 if ! command -v /usr/local/bin/kubectl &> /dev/null; then
   curl -s -O "https://storage.googleapis.com/kubernetes-release/release/v${k8s_version}/bin/linux/amd64//kubectl"
