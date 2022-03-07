@@ -24,7 +24,9 @@ if ! command -v /usr/local/bin/kube-proxy &> /dev/null; then
   restorecon -R -v /usr/local/bin
 fi
 
-mkdir -p /var/lib/kube-proxy
+mkdir -p /var/lib/kubernetes
+mkdir -p /var/lib/kube-proxy/
+
 
 cp /home/ec2-user/proxy-cert.pem /var/lib/kubernetes/proxy.pem
 cp /home/ec2-user/proxy-key.pem /var/lib/kubernetes/proxy-key.pem
