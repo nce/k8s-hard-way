@@ -13,6 +13,7 @@ resource "null_resource" "k8s_apilb_bastion" {
 
   depends_on = [
     local_file.k8s_api_lb,
+    null_resource.k8s_bastion_baseos
   ]
 
   connection {

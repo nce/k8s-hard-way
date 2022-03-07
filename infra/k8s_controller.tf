@@ -2,6 +2,35 @@ resource "random_id" "etcd_encryption_key" {
   byte_length = 32
 }
 
+resource "null_resource" "k8s_controller_baseos" {
+  count = var.controller_instances
+
+  depends_on = [
+    aws_instance.controller
+  ]
+
+  connection {
+    type         = "ssh"
+    user         = "ec2-user"
+    host         = aws_instance.controller.*.private_ip[count.index]
+    bastion_host = aws_instance.bastion.public_ip
+
+  }
+
+  provisioner "file" {
+    source      = "./baseos/baseos.sh"
+    destination = "baseos.sh"
+  }
+
+  provisioner "remote-exec" {
+
+    inline = [
+      "sudo chmod +x baseos.sh",
+      "sudo ./baseos.sh"
+    ]
+  }
+}
+
 resource "local_file" "k8s_apiserver" {
   count = var.controller_instances
 
@@ -27,6 +56,7 @@ resource "null_resource" "k8s_instance_controller_apiserver" {
     null_resource.k8s_apiserver,
     null_resource.k8s_service_account,
     local_file.k8s_apiserver,
+    null_resource.k8s_controller_baseos
   ]
 
   connection {
@@ -70,6 +100,7 @@ resource "null_resource" "k8s_instance_controller_kube_scheduler" {
     null_resource.k8s_ca,
     null_resource.k8s_scheduler,
     local_file.k8s_kube_scheduler,
+    null_resource.k8s_instance_controller_apiserver
   ]
 
   connection {
@@ -115,6 +146,7 @@ resource "null_resource" "k8s_instance_controller_controller_manager" {
     null_resource.k8s_controller_manager,
     null_resource.k8s_service_account,
     local_file.k8s_kube_controller_manager,
+    null_resource.k8s_instance_controller_kube_scheduler
   ]
 
   connection {

@@ -20,23 +20,9 @@ resource "aws_instance" "controller" {
   vpc_security_group_ids      = [aws_security_group.controller.id]
   associate_public_ip_address = true
 
-  user_data = data.cloudinit_config.controller.rendered
-
   root_block_device {
     volume_size           = 30
     delete_on_termination = true
-  }
-
-}
-
-data "cloudinit_config" "controller" {
-  gzip          = false
-  base64_encode = false
-
-  part {
-    filename     = "10-baseos.sh"
-    content_type = "text/x-shellscript"
-    content      = file("cloudinit/10-baseos.sh")
   }
 
 }
