@@ -44,6 +44,11 @@ resource "null_resource" "k8s_ca_worker" {
     bastion_host = aws_instance.bastion.public_ip
   }
 
+  depends_on = [
+    local_file.k8s_ca_cert,
+    local_file.k8s_ca_key,
+  ]
+
   provisioner "file" {
     source      = "./pki/generated/ca-cert.pem"
     destination = "ca-cert.pem"
@@ -58,6 +63,11 @@ resource "null_resource" "k8s_ca" {
     host         = aws_instance.controller.*.private_ip[count.index]
     bastion_host = aws_instance.bastion.public_ip
   }
+
+  depends_on = [
+    local_file.k8s_ca_cert,
+    local_file.k8s_ca_key,
+  ]
 
   provisioner "file" {
     source      = "./pki/generated/ca-key.pem"
@@ -144,6 +154,11 @@ resource "null_resource" "k8s_apiserver" {
     bastion_host = aws_instance.bastion.public_ip
   }
 
+  depends_on = [
+    local_file.k8s_apiserver_cert,
+    local_file.k8s_apiserver_key,
+  ]
+
   provisioner "file" {
     source      = "./pki/generated/apiserver-key.pem"
     destination = "apiserver-key.pem"
@@ -154,7 +169,7 @@ resource "null_resource" "k8s_apiserver" {
   }
 }
 # -- [ apiserver cert ] --
-# ------------------------
+# -------------------------
 
 # --------------------
 # -- [ admin cert ] --
@@ -209,6 +224,12 @@ resource "null_resource" "k8s_admin" {
     host         = aws_instance.controller.*.private_ip[count.index]
     bastion_host = aws_instance.bastion.public_ip
   }
+
+  depends_on = [
+    local_file.k8s_admin_key,
+    local_file.k8s_admin_cert,
+  ]
+
 
   provisioner "file" {
     source      = "./pki/generated/admin-key.pem"
@@ -291,6 +312,11 @@ resource "null_resource" "k8s_kubelet" {
     bastion_host = aws_instance.bastion.public_ip
   }
 
+  depends_on = [
+    local_file.k8s_kubelet_cert,
+    local_file.k8s_kubelet_key,
+  ]
+
   provisioner "file" {
     source      = "./pki/generated/worker${count.index}-kubelet-key.pem"
     destination = "kubelet-key.pem"
@@ -357,6 +383,11 @@ resource "null_resource" "k8s_controller_manager" {
     host         = aws_instance.controller.*.private_ip[count.index]
     bastion_host = aws_instance.bastion.public_ip
   }
+
+  depends_on = [
+    local_file.k8s_controller_manager_cert,
+    local_file.k8s_controller_manager_key,
+  ]
 
   provisioner "file" {
     source      = "./pki/generated/controllermanager-key.pem"
@@ -425,6 +456,11 @@ resource "null_resource" "k8s_proxy" {
     bastion_host = aws_instance.bastion.public_ip
   }
 
+  depends_on = [
+    local_file.k8s_proxy_cert,
+    local_file.k8s_proxy_key,
+  ]
+
   provisioner "file" {
     source      = "./pki/generated/worker${count.index}-proxy-key.pem"
     destination = "proxy-key.pem"
@@ -492,6 +528,11 @@ resource "null_resource" "k8s_scheduler" {
     bastion_host = aws_instance.bastion.public_ip
   }
 
+  depends_on = [
+    local_file.k8s_proxy_cert,
+    local_file.k8s_proxy_key,
+  ]
+
   provisioner "file" {
     source      = "./pki/generated/scheduler-key.pem"
     destination = "scheduler-key.pem"
@@ -558,6 +599,11 @@ resource "null_resource" "k8s_service_account" {
     host         = aws_instance.controller.*.private_ip[count.index]
     bastion_host = aws_instance.bastion.public_ip
   }
+
+  depends_on = [
+    local_file.k8s_service_account_cert,
+    local_file.k8s_service_account_key,
+  ]
 
   provisioner "file" {
     source      = "./pki/generated/serviceaccount-key.pem"
