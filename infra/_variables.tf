@@ -14,6 +14,10 @@ variable "controller_instances" {
   type = number
 }
 
+variable "cluster_service_cidr" {
+  type = string
+}
+
 variable "cluster_service_ip" {
   type = string
 }

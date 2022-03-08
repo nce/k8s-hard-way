@@ -39,7 +39,7 @@ resource "local_file" "k8s_apiserver" {
     controller_instances = var.controller_instances
     etcd_server          = "https://${join(":2379,https://", aws_instance.controller.*.private_ip)}:2379"
     cluster_private_ip   = aws_instance.bastion.private_ip
-    cluster_service_ip   = var.cluster_service_ip
+    cluster_service_cidr = var.cluster_service_cidr
     encryption_key       = random_id.etcd_encryption_key.b64_std
   })
 
@@ -170,9 +170,9 @@ resource "local_file" "k8s_kube_controller_manager" {
   count = var.controller_instances
 
   content = templatefile("kube-controller-manager/kube-controller-manager.sh.tftpl", {
-    k8s_version        = var.k8s_version
-    cluster_cidr       = var.cluster_pod_cidr
-    cluster_service_ip = var.cluster_service_ip
+    k8s_version          = var.k8s_version
+    cluster_cidr         = var.cluster_pod_cidr
+    cluster_service_cidr = var.cluster_service_cidr
   })
 
   filename = "./kube-controller-manager/generated/controller${count.index}.kube-controller-manager.sh"
