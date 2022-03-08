@@ -41,7 +41,7 @@ Documentation=https://github.com/kubernetes/kubernetes
 [Service]
 User=kubernetes
 ExecStart=/usr/local/bin/kube-apiserver \\
-  --advertise-address=$(hostname -i) \\
+  --advertise-address=$(hostname -I) \\
   --allow-privileged=true \\
   --apiserver-count=${controller_instances} \\
   --audit-log-maxage=30 \\
