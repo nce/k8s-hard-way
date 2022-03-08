@@ -49,6 +49,7 @@ cp /home/ec2-user/serviceaccount-key.pem /var/lib/kubernetes/service-account-key
   --kubeconfig=kube-controller-manager.kubeconfig
 
 /usr/local/bin/kubectl config use-context default --kubeconfig=kube-controller-manager.kubeconfig
+chown kubernetes. kube-controller-manager.kubeconfig
 mv kube-controller-manager.kubeconfig /var/lib/kubernetes/kube-controller-manager.kubeconfig
 
 
