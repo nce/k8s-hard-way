@@ -80,6 +80,48 @@ resource "null_resource" "k8s_instance_controller_apiserver" {
   }
 }
 
+resource "local_file" "k8s_admin_kubeconfig" {
+  content = templatefile("apiserver/adminkubeconfig.sh.tftpl", {
+    cluster_public_ip = aws_instance.bastion.public_ip
+  })
+
+  filename = "./apiserver/generated/adminkubeconfig.sh"
+
+  depends_on = [
+    null_resource.k8s_instance_controller_apiserver
+  ]
+}
+
+resource "null_resource" "k8s_admin_kubeconfig" {
+
+  depends_on = [
+    null_resource.k8s_controller_baseos,
+    null_resource.k8s_admin,
+    null_resource.k8s_ca,
+    local_file.k8s_admin_kubeconfig,
+  ]
+
+  connection {
+    type         = "ssh"
+    user         = "ec2-user"
+    host         = aws_instance.controller[0].private_ip
+    bastion_host = aws_instance.bastion.public_ip
+  }
+
+  provisioner "file" {
+    source      = "./apiserver/generated/adminkubeconfig.sh"
+    destination = "adminkubeconfig.sh"
+  }
+
+  provisioner "remote-exec" {
+
+    inline = [
+      "sudo chmod +x adminkubeconfig.sh",
+      "sudo ./adminkubeconfig.sh"
+    ]
+  }
+}
+
 resource "local_file" "k8s_kube_scheduler" {
   count = var.controller_instances
 
@@ -138,7 +180,7 @@ resource "local_file" "k8s_kube_controller_manager" {
   depends_on = [aws_instance.controller]
 }
 
-resource "null_resource" "k8s_instance_controller_controller_manager" {
+resource "null_resource" "k8s_instance_kube_controller_manager" {
   count = var.controller_instances
 
   depends_on = [
