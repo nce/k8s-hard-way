@@ -42,6 +42,7 @@ resource "null_resource" "k8s_instance_worker_cri" {
 
   depends_on = [
     local_file.k8s_worker_cri,
+    null_resource.k8s_worker_baseos
   ]
 
   connection {
