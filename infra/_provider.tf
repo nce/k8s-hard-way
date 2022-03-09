@@ -8,5 +8,9 @@ provider "aws" {
       Name  = "ugo-k8s-hard-way"
     }
   }
+}
 
+provider "kubectl" {
+  load_config_file = true
+  config_path      = "./admin.kubeconfig"
 }

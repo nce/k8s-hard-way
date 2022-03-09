@@ -222,3 +222,53 @@ resource "null_resource" "k8s_admin_kubeconfig_local" {
     command = "scp -o StrictHostKeyChecking=no -J ec2-user@${aws_instance.bastion.public_ip} ec2-user@${aws_instance.controller[0].private_ip}:admin.kubeconfig ."
   }
 }
+
+resource "kubectl_manifest" "cr_kubelet" {
+  depends_on = [
+    null_resource.k8s_admin_kubeconfig_local
+  ]
+
+  yaml_body = <<YAML
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
+  name: system:kube-apiserver-to-kubelet
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - nodes/proxy
+      - nodes/stats
+      - nodes/log
+      - nodes/spec
+      - nodes/metrics
+    verbs:
+      - "*"
+YAML
+}
+
+resource "kubectl_manifest" "crb_kubelet" {
+  depends_on = [
+    null_resource.k8s_admin_kubeconfig_local
+  ]
+
+  yaml_body = <<YAML
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: system:kube-apiserver
+  namespace: ""
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:kube-apiserver-to-kubelet
+subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: User
+    name: kubernetes
+YAML
+}
