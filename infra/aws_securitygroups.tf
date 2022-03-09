@@ -1,4 +1,6 @@
 resource "aws_security_group_rule" "k8sapi" {
+  description = "API Traffic from worker to controlnode"
+
   type      = "ingress"
   from_port = 6443
   to_port   = 6443
