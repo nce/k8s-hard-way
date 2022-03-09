@@ -211,3 +211,14 @@ resource "null_resource" "k8s_instance_kube_controller_manager" {
     ]
   }
 }
+
+resource "null_resource" "k8s_admin_kubeconfig_local" {
+
+  depends_on = [
+    null_resource.k8s_admin_kubeconfig
+  ]
+
+  provisioner "local-exec" {
+    command = "scp -o StrictHostKeyChecking=no -J ec2-user@${aws_instance.bastion.public_ip} ec2-user@${aws_instance.controller[0].private_ip}:admin.kubeconfig ."
+  }
+}
