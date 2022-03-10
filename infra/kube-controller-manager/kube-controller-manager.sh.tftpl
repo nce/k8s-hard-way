@@ -63,6 +63,7 @@ User=kubernetes
 ExecStart=/usr/local/bin/kube-controller-manager \\
   --bind-address=0.0.0.0 \\
   --cluster-cidr=${cluster_cidr} \\
+  --allocate-node-cidrs=true \\
   --cluster-name=kubernetes \\
   --cluster-signing-cert-file=/var/lib/kubernetes/ca.pem \\
   --cluster-signing-key-file=/var/lib/kubernetes/ca-key.pem \\
