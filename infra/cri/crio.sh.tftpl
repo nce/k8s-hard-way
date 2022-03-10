@@ -7,8 +7,13 @@ if ! command -v crio &> /dev/null; then
   curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:${crio_version}.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:${crio_version}/CentOS_8/devel:kubic:libcontainers:stable:cri-o:${crio_version}.repo
 
   yum update -y
-  yum install cri-o -y
+  yum install cri-o cri-tools -y
 fi
+
+# crio creates a cni config which somehow superseeds the one from flannel/weave
+# therfore we use the crio bridge in k8s; this is not wanted
+rm -rf /etc/cni/net.d/200-loopback.conf
+rm -rf /etc/cni/net.d/100-crio-bridge.conf
 
 systemctl daemon-reload
 systemctl enable --now crio
