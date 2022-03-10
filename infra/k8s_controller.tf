@@ -219,7 +219,7 @@ resource "null_resource" "k8s_admin_kubeconfig_local" {
   ]
 
   provisioner "local-exec" {
-    command = "scp -o StrictHostKeyChecking=no -J ec2-user@${aws_instance.bastion.public_ip} ec2-user@${aws_instance.controller[0].private_ip}:admin.kubeconfig ."
+    command = "scp -o ProxyCommand=\"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ec2-user@${aws_instance.bastion.public_ip} -W %h:%p\" -o \"StrictHostKeyChecking=no\" -o \"UserKnownHostsFile=/dev/null\" ec2-user@${aws_instance.controller[0].private_ip}:admin.kubeconfig ."
   }
 }
 
