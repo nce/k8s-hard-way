@@ -1,6 +1,10 @@
 resource "aws_instance" "worker" {
   count = var.worker_instances
 
+  tags = {
+    Name = "ugo-k8s-hard-way-wrk-${count.index}"
+  }
+
   instance_type = "t2.medium"
   ami           = data.aws_ami.rhel.id
 
