@@ -225,7 +225,8 @@ resource "null_resource" "k8s_admin_kubeconfig_local" {
 
 resource "kubectl_manifest" "cr_kubelet" {
   depends_on = [
-    null_resource.k8s_admin_kubeconfig_local
+    null_resource.k8s_admin_kubeconfig_local,
+    null_resource.k8s_instance_controller_apiserver
   ]
 
   yaml_body = <<YAML
@@ -253,7 +254,8 @@ YAML
 
 resource "kubectl_manifest" "crb_kubelet" {
   depends_on = [
-    null_resource.k8s_admin_kubeconfig_local
+    null_resource.k8s_admin_kubeconfig_local,
+    null_resource.k8s_instance_controller_apiserver
   ]
 
   yaml_body = <<YAML
