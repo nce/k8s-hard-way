@@ -223,10 +223,18 @@ resource "null_resource" "k8s_admin_kubeconfig_local" {
   }
 }
 
-resource "kubectl_manifest" "cr_kubelet" {
+resource "time_sleep" "wait_for_k8s_api" {
+  create_duration = "10s"
+
   depends_on = [
     null_resource.k8s_admin_kubeconfig_local,
     null_resource.k8s_instance_controller_apiserver
+  ]
+}
+
+resource "kubectl_manifest" "cr_kubelet" {
+  depends_on = [
+    time_sleep.wait_for_k8s_api
   ]
 
   yaml_body = <<YAML
@@ -254,8 +262,7 @@ YAML
 
 resource "kubectl_manifest" "crb_kubelet" {
   depends_on = [
-    null_resource.k8s_admin_kubeconfig_local,
-    null_resource.k8s_instance_controller_apiserver
+    time_sleep.wait_for_k8s_api
   ]
 
   yaml_body = <<YAML
@@ -274,3 +281,18 @@ subjects:
     name: kubernetes
 YAML
 }
+
+data "kubectl_file_documents" "calico" {
+  content = file("calico/calico.yaml")
+}
+
+resource "kubectl_manifest" "calico" {
+  for_each  = data.kubectl_file_documents.calico.manifests
+  yaml_body = each.value
+
+  depends_on = [
+    time_sleep.wait_for_k8s_api
+  ]
+
+}
+
