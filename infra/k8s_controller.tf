@@ -224,11 +224,22 @@ resource "null_resource" "k8s_admin_kubeconfig_local" {
 }
 
 resource "time_sleep" "wait_for_k8s_api" {
-  create_duration = "10s"
+  create_duration = "20s"
 
   depends_on = [
     null_resource.k8s_admin_kubeconfig_local,
-    null_resource.k8s_instance_controller_apiserver
+    null_resource.k8s_instance_controller_apiserver,
+    null_resource.k8s_apilb_bastion,
+    aws_security_group.worker,
+    aws_security_group.controller,
+    aws_security_group.bastion,
+    aws_security_group_rule.k8sapi,
+    aws_security_group_rule.ssh_to_controller,
+    aws_security_group_rule.etcd_to_controller,
+    aws_security_group_rule.scheduler_from_controller,
+    aws_security_group_rule.controllermanager_from_controller,
+    aws_security_group_rule.proxy_from_controller,
+    aws_security_group_rule.kubelet_from_controller,
   ]
 }
 
