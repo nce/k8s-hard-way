@@ -1,3 +1,12 @@
+resource "aws_eip" "bastion" {
+  vpc = true
+}
+
+resource "aws_eip_association" "bastion" {
+  instance_id   = aws_instance.bastion.id
+  allocation_id = aws_eip.bastion.id
+}
+
 resource "aws_instance" "bastion" {
   instance_type = "t2.micro"
   ami           = data.aws_ami.rhel.id
