@@ -25,18 +25,10 @@ resource "aws_security_group" "worker" {
   description = "Worker Group"
 
   ingress {
-    # calicos BGP communication
-    from_port = 179
-    to_port   = 179
-    protocol  = "tcp"
-
-    self = true
-  }
-
-  ingress {
-    from_port = 30000
-    protocol  = "tcp"
-    to_port   = 32767
+    # allow all worker to worker traffic
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
 
     self = true
   }
