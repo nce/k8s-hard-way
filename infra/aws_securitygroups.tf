@@ -2,53 +2,76 @@ resource "aws_security_group" "controller" {
   vpc_id      = aws_vpc.vpc.id
   description = "Controller Group"
 
-  ingress {
-    from_port = 0
-    protocol  = "-1"
-    to_port   = 0
+}
 
-    security_groups = [aws_security_group.bastion.id]
-  }
+resource "aws_security_group_rule" "bastion_to_controller" {
+  description = "All traffic from the bastion to the controller"
 
-  egress {
-    from_port = 0
-    protocol  = "-1"
-    to_port   = 0
+  type      = "ingress"
+  from_port = 0
+  protocol  = "-1"
+  to_port   = 0
 
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
+  security_group_id        = aws_security_group.controller.id
+  source_security_group_id = aws_security_group.bastion.id
+}
+
+resource "aws_security_group_rule" "controller_to_everywhere" {
+  description = "All outgoing traffic from the controller"
+
+  type      = "egress"
+  from_port = 0
+  protocol  = "-1"
+  to_port   = 0
+
+  cidr_blocks      = ["0.0.0.0/0"]
+  ipv6_cidr_blocks = ["::/0"]
+
+  security_group_id = aws_security_group.controller.id
 }
 
 resource "aws_security_group" "worker" {
   vpc_id      = aws_vpc.vpc.id
   description = "Worker Group"
+}
 
-  ingress {
-    # allow all worker to worker traffic
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+resource "aws_security_group_rule" "worker_to_worker" {
+  description = "All traffic from the worker to the worker"
 
-    self = true
-  }
+  type      = "ingress"
+  from_port = 0
+  to_port   = 0
+  protocol  = "-1"
 
-  ingress {
-    from_port = 0
-    protocol  = "-1"
-    to_port   = 0
+  self = true
 
-    security_groups = [aws_security_group.bastion.id]
-  }
+  security_group_id = aws_security_group.worker.id
+}
 
-  egress {
-    from_port = 0
-    protocol  = "-1"
-    to_port   = 0
+resource "aws_security_group_rule" "bastion_to_worker" {
+  description = "All traffic from the bastion to the worker"
 
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
+  type      = "ingress"
+  from_port = 0
+  protocol  = "-1"
+  to_port   = 0
+
+  source_security_group_id = aws_security_group.bastion.id
+  security_group_id        = aws_security_group.worker.id
+}
+
+resource "aws_security_group_rule" "worker_to_everywhere" {
+  description = "All traffic from the worker to the worker"
+
+  type      = "egress"
+  from_port = 0
+  protocol  = "-1"
+  to_port   = 0
+
+  cidr_blocks      = ["0.0.0.0/0"]
+  ipv6_cidr_blocks = ["::/0"]
+
+  security_group_id = aws_security_group.worker.id
 }
 
 resource "aws_security_group_rule" "k8sapi" {
