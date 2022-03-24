@@ -14,12 +14,12 @@ resource "aws_internet_gateway" "vpc" {
 
 resource "aws_default_route_table" "vpc" {
   default_route_table_id = aws_vpc.vpc.default_route_table_id
+}
 
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.vpc.id
-  }
-
+resource "aws_route" "internet" {
+  route_table_id         = aws_default_route_table.vpc.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.vpc.id
 }
 
 # setup az <-> subnet mapping
@@ -60,6 +60,14 @@ resource "aws_route" "pod_routing" {
   count = var.worker_instances
 
   route_table_id         = aws_vpc.vpc.default_route_table_id
-  destination_cidr_block = "10.200.${count.index}.0/24"
+  destination_cidr_block = "10.200.${count.index + var.controller_instances}.0/24"
   network_interface_id   = aws_instance.worker[count.index].primary_network_interface_id
+}
+
+resource "aws_route" "pod_routing_controller" {
+  count = var.controller_instances
+
+  route_table_id         = aws_vpc.vpc.default_route_table_id
+  destination_cidr_block = "10.200.${count.index}.0/24"
+  network_interface_id   = aws_instance.controller[count.index].primary_network_interface_id
 }

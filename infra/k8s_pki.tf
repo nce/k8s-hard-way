@@ -243,8 +243,94 @@ resource "null_resource" "k8s_admin" {
 # -- [ admin cert ] --
 # --------------------
 
-# ----------------------
-# -- [ kubelet cert ] --
+# ---------------------------------
+# -- [ controller kubelet cert ] --
+resource "tls_private_key" "k8s_kubelet_controller" {
+  count = var.controller_instances
+
+  algorithm = "RSA"
+  rsa_bits  = "2048"
+}
+resource "tls_cert_request" "k8s_kubelet_controller" {
+  count = var.controller_instances
+
+  key_algorithm   = tls_private_key.k8s_kubelet_controller.*.algorithm[count.index]
+  private_key_pem = tls_private_key.k8s_kubelet_controller.*.private_key_pem[count.index]
+
+  dns_names = [
+    aws_instance.controller.*.private_dns[count.index]
+  ]
+  ip_addresses = [
+    aws_instance.controller.*.private_ip[count.index]
+  ]
+
+  subject {
+    common_name         = "system:node:${aws_instance.controller.*.private_dns[count.index]}"
+    organization        = "system:nodes"
+    country             = "DE"
+    locality            = "Bavaria"
+    organizational_unit = "K8s the hard way"
+  }
+}
+
+resource "tls_locally_signed_cert" "k8s_kubelet_controller" {
+  count = var.controller_instances
+
+  cert_request_pem   = tls_cert_request.k8s_kubelet_controller.*.cert_request_pem[count.index]
+  ca_key_algorithm   = tls_private_key.k8s_ca.algorithm
+  ca_private_key_pem = tls_private_key.k8s_ca.private_key_pem
+  ca_cert_pem        = tls_self_signed_cert.k8s_ca.cert_pem
+
+  validity_period_hours = 8760
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "cert_signing",
+    "client_auth",
+    "server_auth",
+  ]
+}
+resource "local_file" "k8s_kubelet_key_controller" {
+  count    = var.controller_instances
+  content  = tls_private_key.k8s_kubelet_controller.*.private_key_pem[count.index]
+  filename = "./pki/generated/controller${count.index}-kubelet-key.pem"
+}
+resource "local_file" "k8s_kubelet_cert_controller" {
+  count    = var.controller_instances
+  content  = tls_locally_signed_cert.k8s_kubelet_controller.*.cert_pem[count.index]
+  filename = "./pki/generated/controller${count.index}-kubelet-cert.pem"
+}
+
+resource "null_resource" "k8s_kubelet_controller" {
+  count = var.controller_instances
+
+  connection {
+    type         = "ssh"
+    user         = "ec2-user"
+    host         = aws_instance.controller.*.private_ip[count.index]
+    bastion_host = aws_instance.bastion.public_ip
+  }
+
+  depends_on = [
+    local_file.k8s_kubelet_cert_controller,
+    local_file.k8s_kubelet_key_controller,
+  ]
+
+  provisioner "file" {
+    source      = "./pki/generated/controller${count.index}-kubelet-key.pem"
+    destination = "kubelet-key.pem"
+  }
+  provisioner "file" {
+    source      = "./pki/generated/controller${count.index}-kubelet-cert.pem"
+    destination = "kubelet-cert.pem"
+  }
+}
+# -- [ controller kubelet cert ] --
+# ---------------------------------
+#
+# -----------------------------
+# -- [ worker kubelet cert ] --
 resource "tls_private_key" "k8s_kubelet" {
   count = var.worker_instances
 
@@ -326,9 +412,8 @@ resource "null_resource" "k8s_kubelet" {
     destination = "kubelet-cert.pem"
   }
 }
-# -- [ kubelet cert ] --
-# ----------------------
-
+# -- [ worker kubelet cert ] --
+# -----------------------------
 
 # ---------------------------------
 # -- [ controller_manager cert ] --
@@ -467,6 +552,42 @@ resource "null_resource" "k8s_proxy" {
   }
   provisioner "file" {
     source      = "./pki/generated/worker${count.index}-proxy-cert.pem"
+    destination = "proxy-cert.pem"
+  }
+}
+
+resource "local_file" "k8s_proxy_key_controller" {
+  count    = var.controller_instances
+  content  = tls_private_key.k8s_proxy.private_key_pem
+  filename = "./pki/generated/controller${count.index}-proxy-key.pem"
+}
+resource "local_file" "k8s_proxy_cert_controller" {
+  count    = var.controller_instances
+  content  = tls_locally_signed_cert.k8s_proxy.cert_pem
+  filename = "./pki/generated/controller${count.index}-proxy-cert.pem"
+}
+
+resource "null_resource" "k8s_proxy_controller" {
+  count = var.controller_instances
+
+  connection {
+    type         = "ssh"
+    user         = "ec2-user"
+    host         = aws_instance.controller.*.private_ip[count.index]
+    bastion_host = aws_instance.bastion.public_ip
+  }
+
+  depends_on = [
+    local_file.k8s_proxy_cert_controller,
+    local_file.k8s_proxy_key_controller,
+  ]
+
+  provisioner "file" {
+    source      = "./pki/generated/controller${count.index}-proxy-key.pem"
+    destination = "proxy-key.pem"
+  }
+  provisioner "file" {
+    source      = "./pki/generated/controller${count.index}-proxy-cert.pem"
     destination = "proxy-cert.pem"
   }
 }
