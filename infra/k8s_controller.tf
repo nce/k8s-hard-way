@@ -2,11 +2,22 @@ resource "random_id" "etcd_encryption_key" {
   byte_length = 32
 }
 
+resource "local_file" "k8s_controller_cri" {
+  content = templatefile("cri/crio.sh.tftpl", {
+    crio_version = var.crio_version
+  })
+
+  filename = "./crio/generated/crio.sh"
+
+  depends_on = [aws_instance.controller]
+}
+
 resource "null_resource" "k8s_controller_baseos" {
   count = var.controller_instances
 
   depends_on = [
-    aws_instance.controller
+    aws_instance.controller,
+    null_resource.k8s_bastion_baseos
   ]
 
   connection {
@@ -14,7 +25,6 @@ resource "null_resource" "k8s_controller_baseos" {
     user         = "ec2-user"
     host         = aws_instance.controller.*.private_ip[count.index]
     bastion_host = aws_instance.bastion.public_ip
-
   }
 
   provisioner "file" {
@@ -30,6 +40,136 @@ resource "null_resource" "k8s_controller_baseos" {
     ]
   }
 }
+
+resource "local_file" "k8s_controller_proxy" {
+  count = var.controller_instances
+
+  content = templatefile("kube-proxy/kube-proxy.sh.tftpl", {
+    k8s_version        = var.k8s_version
+    cluster_private_ip = aws_instance.bastion.private_ip
+  })
+
+  filename = "./kube-proxy/generated/controller${count.index}-kube-proxy.sh"
+
+  depends_on = [
+    aws_instance.controller
+  ]
+}
+
+resource "null_resource" "k8s_instance_controller_proxy" {
+  count = var.controller_instances
+
+  depends_on = [
+    null_resource.k8s_instance_controller,
+    null_resource.k8s_ca,
+    null_resource.k8s_proxy_controller,
+    null_resource.k8s_admin,
+    local_file.k8s_controller_proxy,
+    null_resource.k8s_bastion_baseos,
+  ]
+
+  connection {
+    type         = "ssh"
+    user         = "ec2-user"
+    host         = aws_instance.controller.*.private_ip[count.index]
+    bastion_host = aws_instance.bastion.public_ip
+  }
+
+  provisioner "file" {
+    source      = "./kube-proxy/generated/controller${count.index}-kube-proxy.sh"
+    destination = "kube-proxy.sh"
+  }
+
+  provisioner "remote-exec" {
+
+    inline = [
+      "sudo chmod +x kube-proxy.sh",
+      "sudo ./kube-proxy.sh"
+    ]
+  }
+}
+
+resource "null_resource" "k8s_instance_controller_cri" {
+  count = var.controller_instances
+
+  depends_on = [
+    local_file.k8s_controller_cri,
+    null_resource.k8s_controller_baseos,
+    null_resource.k8s_bastion_baseos
+  ]
+
+  connection {
+    type         = "ssh"
+    user         = "ec2-user"
+    host         = aws_instance.controller.*.private_ip[count.index]
+    bastion_host = aws_instance.bastion.public_ip
+  }
+
+  provisioner "file" {
+    source      = "./crio/generated/crio.sh"
+    destination = "crio.sh"
+  }
+
+  provisioner "remote-exec" {
+
+    inline = [
+      "sudo chmod +x crio.sh",
+      "sudo ./crio.sh"
+    ]
+  }
+}
+
+resource "local_file" "k8s_controller_kubelet" {
+  count = var.controller_instances
+
+  content = templatefile("kubelet/kubelet.sh.tftpl", {
+    k8s_version        = var.k8s_version
+    cluster_private_ip = aws_instance.bastion.private_ip
+    pod_cidr           = "10.200.${count.index}.0/24"
+  })
+
+  filename = "./kubelet/generated/controller${count.index}-kubelet.sh"
+
+  depends_on = [
+    aws_instance.controller,
+    null_resource.k8s_controller_baseos,
+  ]
+}
+
+resource "null_resource" "k8s_instance_controller" {
+  count = var.controller_instances
+
+  depends_on = [
+    null_resource.k8s_ca,
+    null_resource.k8s_kubelet_controller,
+    null_resource.k8s_proxy,
+    null_resource.k8s_admin,
+    null_resource.k8s_bastion_baseos,
+    null_resource.k8s_instance_controller_cri,
+    local_file.k8s_controller_kubelet,
+  ]
+
+  connection {
+    type         = "ssh"
+    user         = "ec2-user"
+    host         = aws_instance.controller.*.private_ip[count.index]
+    bastion_host = aws_instance.bastion.public_ip
+  }
+
+  provisioner "file" {
+    source      = "./kubelet/generated/controller${count.index}-kubelet.sh"
+    destination = "kubelet.sh"
+  }
+
+  provisioner "remote-exec" {
+
+    inline = [
+      "sudo chmod +x kubelet.sh",
+      "sudo ./kubelet.sh"
+    ]
+  }
+}
+
 
 resource "local_file" "k8s_apiserver" {
   count = var.controller_instances
@@ -55,8 +195,9 @@ resource "null_resource" "k8s_instance_controller_apiserver" {
     null_resource.k8s_ca,
     null_resource.k8s_apiserver,
     null_resource.k8s_service_account,
+    null_resource.k8s_controller_baseos,
+    null_resource.k8s_bastion_baseos,
     local_file.k8s_apiserver,
-    null_resource.k8s_controller_baseos
   ]
 
   connection {
@@ -98,6 +239,7 @@ resource "null_resource" "k8s_admin_kubeconfig" {
     null_resource.k8s_controller_baseos,
     null_resource.k8s_admin,
     null_resource.k8s_ca,
+    null_resource.k8s_bastion_baseos,
     local_file.k8s_admin_kubeconfig,
   ]
 
@@ -142,6 +284,7 @@ resource "null_resource" "k8s_instance_controller_kube_scheduler" {
     null_resource.k8s_ca,
     null_resource.k8s_scheduler,
     local_file.k8s_kube_scheduler,
+    null_resource.k8s_bastion_baseos,
     null_resource.k8s_instance_controller_apiserver
   ]
 
@@ -187,6 +330,7 @@ resource "null_resource" "k8s_instance_kube_controller_manager" {
     null_resource.k8s_ca,
     null_resource.k8s_controller_manager,
     null_resource.k8s_service_account,
+    null_resource.k8s_bastion_baseos,
     local_file.k8s_kube_controller_manager,
     null_resource.k8s_instance_controller_kube_scheduler
   ]
@@ -302,8 +446,21 @@ resource "kubectl_manifest" "calico" {
   yaml_body = each.value
 
   depends_on = [
-    time_sleep.wait_for_k8s_api
+    time_sleep.wait_for_k8s_api,
+    null_resource.k8s_taint_label_controller
   ]
 
 }
 
+resource "null_resource" "k8s_taint_label_controller" {
+  count = var.controller_instances
+
+  depends_on = [
+    time_sleep.wait_for_k8s_api
+  ]
+
+  provisioner "local-exec" {
+    command = "kubectl --kubeconfig admin.kubeconfig taint nodes ${aws_instance.controller.*.private_dns[count.index]} master=master:NoSchedule && kubectl --kubeconfig admin.kubeconfig label nodes ${aws_instance.controller.*.private_dns[count.index]} node-role.kubernetes.io/master=\"\""
+  }
+
+}

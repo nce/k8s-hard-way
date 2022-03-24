@@ -12,7 +12,8 @@ resource "null_resource" "k8s_worker_baseos" {
   count = var.worker_instances
 
   depends_on = [
-    aws_instance.worker
+    aws_instance.worker,
+    null_resource.k8s_bastion_baseos,
   ]
 
   connection {
@@ -42,7 +43,8 @@ resource "null_resource" "k8s_instance_worker_cri" {
 
   depends_on = [
     local_file.k8s_worker_cri,
-    null_resource.k8s_worker_baseos
+    null_resource.k8s_worker_baseos,
+    null_resource.k8s_bastion_baseos,
   ]
 
   connection {
@@ -72,7 +74,7 @@ resource "local_file" "k8s_worker_kubelet" {
   content = templatefile("kubelet/kubelet.sh.tftpl", {
     k8s_version        = var.k8s_version
     cluster_private_ip = aws_instance.bastion.private_ip
-    pod_cidr           = "10.200.${count.index}.0/24"
+    pod_cidr           = "10.200.${count.index + var.controller_instances}.0/24"
   })
 
   filename = "./kubelet/generated/worker${count.index}-kubelet.sh"
@@ -80,7 +82,7 @@ resource "local_file" "k8s_worker_kubelet" {
   depends_on = [
     aws_instance.worker,
     null_resource.k8s_instance_worker_cri,
-    null_resource.k8s_controller_baseos
+    null_resource.k8s_worker_baseos
   ]
 }
 
@@ -93,6 +95,7 @@ resource "null_resource" "k8s_instance_worker" {
     null_resource.k8s_proxy,
     null_resource.k8s_admin,
     local_file.k8s_worker_kubelet,
+    null_resource.k8s_bastion_baseos,
   ]
 
   connection {
@@ -140,6 +143,7 @@ resource "null_resource" "k8s_instance_worker_proxy" {
     null_resource.k8s_proxy,
     null_resource.k8s_admin,
     local_file.k8s_worker_proxy,
+    null_resource.k8s_bastion_baseos,
   ]
 
   connection {
