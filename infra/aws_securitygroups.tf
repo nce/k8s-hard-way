@@ -200,3 +200,39 @@ resource "aws_security_group_rule" "kubelet_from_controller" {
   source_security_group_id = aws_security_group.controller.id
   security_group_id        = aws_security_group.worker.id
 }
+
+resource "aws_security_group_rule" "kubelet_from_controller_to_controller" {
+  description = "kubelet from controller to controller"
+
+  type      = "ingress"
+  from_port = 10250
+  to_port   = 10250
+  protocol  = "tcp"
+
+  source_security_group_id = aws_security_group.controller.id
+  security_group_id        = aws_security_group.controller.id
+}
+
+resource "aws_security_group_rule" "proxy_from_controller_to_controller" {
+  description = "proxy from controller to controller"
+
+  type      = "ingress"
+  from_port = 10249
+  to_port   = 10249
+  protocol  = "tcp"
+
+  source_security_group_id = aws_security_group.controller.id
+  security_group_id        = aws_security_group.controller.id
+}
+
+resource "aws_security_group_rule" "bgp_from_controller_to_controller" {
+  description = "bgp from controller to controller"
+
+  type      = "ingress"
+  from_port = 179
+  to_port   = 179
+  protocol  = "tcp"
+
+  source_security_group_id = aws_security_group.controller.id
+  security_group_id        = aws_security_group.controller.id
+}
