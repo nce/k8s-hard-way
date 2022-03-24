@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: cks-psp
+spec: {}
+status: {}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: cks-psp
+  creationTimestamp: null
+  labels:
+    run: web-01
+  name: web-01
+spec:
+  containers:
+  - image: nginx:alpine
+    name: web-01
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    run: web-01
+  name: web01
+  namespace: cks-psp
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    run: web-01
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: web-client
+  name: web-client
+  namespace: cks-psp
+spec:
+  containers:
+  - args:
+    - sh
+    - -c
+    - while :; do curl web01:80; sleep 5; done
+    image: radial/busyboxplus:curl
+    name: web-client
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: web-client-denied
+  name: web-client-denied
+  namespace: cks-psp
+spec:
+  containers:
+  - args:
+    - sh
+    - -c
+    - while :; do curl web01:80; sleep 5; done
+    image: radial/busyboxplus:curl
+    name: web-client
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}

@@ -1,0 +1,59 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: cks-psp
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-web-client-egress
+  namespace: cks-psp
+spec:
+  podSelector:
+    matchLabels:
+      run: web-client
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          run: web-01
+      namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: cks-psp
+    ports:
+    - port: 80
+      protocol: TCP
+  - ports:
+    - port: 53
+      protocol: UDP
+    - port: 53
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-web-server-ingress
+  namespace: cks-psp
+spec:
+  podSelector:
+    matchLabels:
+      run: web-01
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          run: web-client
+      namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: cks-psp
