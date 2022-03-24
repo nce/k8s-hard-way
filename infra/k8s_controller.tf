@@ -446,8 +446,21 @@ resource "kubectl_manifest" "calico" {
   yaml_body = each.value
 
   depends_on = [
-    time_sleep.wait_for_k8s_api
+    time_sleep.wait_for_k8s_api,
+    null_resource.k8s_taint_label_controller
   ]
 
 }
 
+resource "null_resource" "k8s_taint_label_controller" {
+  count = var.controller_instances
+
+  depends_on = [
+    time_sleep.wait_for_k8s_api
+  ]
+
+  provisioner "local-exec" {
+    command = "kubectl --kubeconfig admin.kubeconfig taint nodes ${aws_instance.controller.*.private_dns[count.index]} master=master:NoSchedule && kubectl --kubeconfig admin.kubeconfig label nodes ${aws_instance.controller.*.private_dns[count.index]} node-role.kubernetes.io/master=\"\""
+  }
+
+}
