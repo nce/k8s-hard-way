@@ -24,6 +24,10 @@ resource "aws_instance" "controller" {
   vpc_security_group_ids      = [aws_security_group.controller.id]
   associate_public_ip_address = true
 
+  metadata_options {
+    http_put_response_hop_limit = 2
+  }
+
   root_block_device {
     volume_size           = 30
     delete_on_termination = true

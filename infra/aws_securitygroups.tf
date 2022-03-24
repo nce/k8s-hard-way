@@ -74,6 +74,22 @@ resource "aws_security_group_rule" "worker_to_everywhere" {
   security_group_id = aws_security_group.worker.id
 }
 
+resource "aws_security_group_rule" "aws_ingress" {
+  description = "API Traffic from controller to worker"
+
+  type      = "ingress"
+  from_port = 9443
+  to_port   = 9443
+  protocol  = "tcp"
+
+  cidr_blocks      = ["0.0.0.0/0"]
+  ipv6_cidr_blocks = ["::/0"]
+
+
+  security_group_id = aws_security_group.worker.id
+}
+
+
 resource "aws_security_group_rule" "k8sapi" {
   description = "API Traffic from worker to controlnode"
 
