@@ -2,7 +2,8 @@ resource "aws_instance" "controller" {
   count = var.controller_instances
 
   tags = {
-    Name = "ugo-k8s-hard-way-ctrl-${count.index}"
+    Name                               = "ugo-k8s-hard-way-ctrl-${count.index}"
+    "kubernetes.io/cluster/kubernetes" = "owned"
   }
 
   instance_type = "t2.medium"
@@ -23,6 +24,13 @@ resource "aws_instance" "controller" {
 
   vpc_security_group_ids      = [aws_security_group.controller.id]
   associate_public_ip_address = true
+
+  iam_instance_profile = aws_iam_instance_profile.aws_cloud_provider_controller.name
+
+  metadata_options {
+    http_put_response_hop_limit = 2
+    http_endpoint               = "enabled"
+  }
 
   root_block_device {
     volume_size           = 30

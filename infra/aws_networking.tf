@@ -6,6 +6,10 @@ resource "aws_vpc" "vpc" {
   enable_dns_hostnames = true
   enable_dns_support   = true
 
+  tags = {
+    "kubernetes.io/cluster/kubernetes" = "owned"
+  }
+
 }
 
 resource "aws_internet_gateway" "vpc" {
@@ -54,6 +58,11 @@ resource "aws_subnet" "subnet" {
   vpc_id            = aws_vpc.vpc.id
   availability_zone = each.key
   cidr_block        = cidrsubnet(aws_vpc.vpc.cidr_block, 4, var.az_mapping[each.value.name_suffix])
+
+  tags = {
+    "kubernetes.io/role/elb"           = "1"
+    "kubernetes.io/cluster/kubernetes" = "owned"
+  }
 }
 
 resource "aws_route" "pod_routing" {
