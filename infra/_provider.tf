@@ -4,8 +4,9 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Owner = "ugo"
-      Name  = "ugo-k8s-hard-way"
+      project = "ugo-k8s-hard-way"
+      Owner   = "ugo"
+      Name    = "ugo-k8s-hard-way"
     }
   }
 }
