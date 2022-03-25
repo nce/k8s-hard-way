@@ -15,7 +15,6 @@ resource "aws_route53_record" "bastion" {
   records = [aws_instance.bastion.public_ip]
 }
 
-
 resource "aws_route53_record" "adorsys_sandbox_aws_adorsys_de_NS" {
   zone_id = data.aws_route53_zone.adorsys_sandbox.id
   name    = aws_route53_zone.dns.name

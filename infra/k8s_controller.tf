@@ -377,13 +377,13 @@ resource "time_sleep" "wait_for_k8s_api" {
     aws_security_group.worker,
     aws_security_group.controller,
     aws_security_group.bastion,
-    aws_security_group_rule.k8sapi,
-    aws_security_group_rule.ssh_to_controller,
-    aws_security_group_rule.etcd_to_controller,
-    aws_security_group_rule.scheduler_from_controller,
-    aws_security_group_rule.controllermanager_from_controller,
-    aws_security_group_rule.proxy_from_controller,
-    aws_security_group_rule.kubelet_from_controller,
+    #aws_security_group_rule.k8sapi,
+    #aws_security_group_rule.ssh_to_controller,
+    #aws_security_group_rule.etcd_to_controller,
+    #aws_security_group_rule.scheduler_from_controller,
+    ##aws_security_group_rule.controllermanager_from_controller,
+    #aws_security_group_rule.proxy_from_controller,
+    #aws_security_group_rule.kubelet_from_controller,
   ]
 }
 
@@ -479,7 +479,7 @@ resource "null_resource" "k8s_taint_label_controller" {
   ]
 
   provisioner "local-exec" {
-    command = "kubectl --kubeconfig admin.kubeconfig taint --overwrite=true nodes ${aws_instance.controller.*.private_dns[count.index]} master=master:NoSchedule && kubectl --kubeconfig admin.kubeconfig label nodes ${aws_instance.controller.*.private_dns[count.index]} node-role.kubernetes.io/master=\"\""
+    command = "kubectl --kubeconfig admin.kubeconfig taint --overwrite=true nodes ${aws_instance.controller.*.private_dns[count.index]} node-role.kubernetes.io/master=:NoSchedule && kubectl --kubeconfig admin.kubeconfig label --overwrite=true nodes ${aws_instance.controller.*.private_dns[count.index]} node-role.kubernetes.io/master=\"\""
   }
 
 }
