@@ -81,8 +81,8 @@ ExecStart=/usr/local/bin/kubelet \\
   --cgroup-driver="systemd" \\
   --network-plugin=cni \\
   --register-node=true \\
- --v=2 \\
- --cloud-provider=external
+  --v=2 \\
+  --cloud-provider=external
 Restart=on-failure
 RestartSec=5
 

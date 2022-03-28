@@ -37,3 +37,7 @@ variable "etcd_version" {
 variable "cluster_pod_cidr" {
   type = string
 }
+
+variable "dex_login_url" {
+  type = string
+}
