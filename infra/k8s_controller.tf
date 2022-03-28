@@ -223,7 +223,8 @@ resource "null_resource" "k8s_instance_controller_apiserver" {
 
 resource "local_file" "k8s_admin_kubeconfig" {
   content = templatefile("apiserver/adminkubeconfig.sh.tftpl", {
-    cluster_public_ip = aws_instance.bastion.public_ip
+    cluster_public_dns = aws_route53_record.bastion.name
+    dex_login_url      = var.dex_login_url
   })
 
   filename = "./apiserver/generated/adminkubeconfig.sh"
@@ -453,6 +454,27 @@ metadata:
   name: awscredentials
   namespace: kube-system
 type: Opaque
+YAML
+}
+
+resource "kubectl_manifest" "clusterrolebinding_oidc" {
+  depends_on = [
+    time_sleep.wait_for_k8s_api
+  ]
+
+  yaml_body = <<YAML
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cluster-admin-oidc-group
+subjects:
+- kind: Group
+  name: oidc:nce-acme:admin # Name is case sensitive
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
 YAML
 }
 
