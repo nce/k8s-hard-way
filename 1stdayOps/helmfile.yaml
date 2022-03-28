@@ -1,0 +1,120 @@
+repositories:
+  #- name: stable
+  #url: https://charts.helm.sh/stable
+- name: aws-cloud-controller-manager
+  url: https://kubernetes.github.io/cloud-provider-aws
+- name: coredns
+  url: https://coredns.github.io/helm
+- name: eks
+  url: https://aws.github.io/eks-charts
+- name: external-dns
+  url: https://kubernetes-sigs.github.io/external-dns/
+- name: argo 
+  url: https://argoproj.github.io/argo-helm
+- name: dex
+  url: https://charts.dexidp.io
+
+helmDefaults:
+  cleanupOnFail: false
+  wait: true
+
+releases:
+- name: aws-cloud-controller-manager
+  namespace: kube-system 
+  chart: aws-cloud-controller-manager/aws-cloud-controller-manager
+  values:
+    # required flags for the controller to start..
+    - args:
+      - --v=2
+      - --cloud-provider=aws
+      - --cluster-cidr=10.200.0.0/16
+      - --cluster-name=kubernetes
+
+- name: coredns
+  namespace: kube-system
+  chart: coredns/coredns
+  labels:
+    name: dns
+  values:
+    - tolerations:
+      - key: node.cloudprovider.kubernetes.io/uninitialized
+        value: "true"
+        effect: NoSchedule
+  set:
+  - name: service.clusterIP
+    value: "10.32.0.53"
+- name: external-dns
+  namespace: kube-system
+  chart: external-dns/external-dns
+- name: aws-load-balancer-controller
+  namespace: kube-system
+  chart: eks/aws-load-balancer-controller
+  labels:
+    name: lb
+  set:
+  - name: clusterName
+    value: kubernetes
+  values:
+    - image:
+        repository: amazon/aws-alb-ingress-controller
+    - env:
+        # dirty hack to inject the credentials as secret
+        name: >-
+          b"
+                  - name: AWS_ACCESS_KEY_ID
+                    valueFrom:
+                      secretKeyRef:
+                        name: awscredentials
+                        key: keyid
+                        optional: false
+                  - name: AWS_SECRET_ACCESS_KEY
+                    valueFrom:
+                      secretKeyRef:
+                        name: awscredentials
+                        key: keysecret
+                        optional: false #
+- name: argo
+  chart: argo/argo-cd
+  values:
+  - dex:
+      enabled: false
+  - server:
+      extraArgs:
+        - --insecure
+      service:
+        type: "NodePort"
+      ingress:
+        enabled: true
+        ingressClassName: alb
+        hosts:
+          - argo.ugo-k8s.adorsys-sandbox.aws.adorsys.de
+        annotations:
+          alb.ingress.kubernetes.io/scheme: internet-facing
+          alb.ingress.kubernetes.io/group.name: default
+          alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80},{"HTTPS": 443}]'
+          alb.ingress.kubernetes.io/ssl-redirect: "443"
+
+- name: dex
+  chart: dex/dex
+  values:
+  - dex/values.config.yaml
+  - replicaCount: 2
+  - https:
+      enabled: false
+  - service:
+      type: NodePort
+  - ingress:
+      enabled: true
+      className: alb
+      hosts:
+        - host: login.ugo-k8s.adorsys-sandbox.aws.adorsys.de
+          paths:
+            - path: /
+              pathType: Prefix
+      annotations:
+        alb.ingress.kubernetes.io/scheme: internet-facing
+        alb.ingress.kubernetes.io/group.name: default
+        alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80},{"HTTPS": 443}]'
+        alb.ingress.kubernetes.io/ssl-redirect: "443"
+
+
