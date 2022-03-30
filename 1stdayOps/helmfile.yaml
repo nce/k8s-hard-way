@@ -79,6 +79,28 @@ releases:
   - dex:
       enabled: false
   - server:
+      config:
+        # Argo CD's externally facing base URL (optional). Required when configuring SSO
+        url: https://argo.ugo-k8s.adorsys-sandbox.aws.adorsys.de
+        application.instanceLabelKey: argocd.argoproj.io/instance
+
+        oidc.config: |
+          name: Github
+          issuer: https://login.ugo-k8s.adorsys-sandbox.aws.adorsys.de/dex/
+          clientID: argo
+          clientSecret: ir1vahtishaiThoceej9aish6raosae2
+          requestedIDTokenClaims:
+            groups:
+              essential: true
+          requestedScopes:
+            - openid
+            - email
+            - profile
+            - groups
+      rbacConfig:
+        policy.csv: |
+          g, nce-acme:admin, role:admin
+          g, nce-acme:zuschauer, role:readonly
       extraArgs:
         - --insecure
       service:
