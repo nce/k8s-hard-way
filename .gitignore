@@ -1,6 +1,7 @@
 old/
 generated/
 *kubeconfig
+static
 # Local .terraform directories
 **/.terraform/*
 
