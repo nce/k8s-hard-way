@@ -457,6 +457,126 @@ type: Opaque
 YAML
 }
 
+data "aws_ssm_parameter" "sealed_secret_cert" {
+  name = "/ugo-kubernetes-the-hard-way/sealedsecrets/sealedsecrets.crt"
+}
+data "aws_ssm_parameter" "sealed_secret_key" {
+  name = "/ugo-kubernetes-the-hard-way/sealedsecrets/sealedsecrets.key"
+}
+
+resource "kubectl_manifest" "sealed_secret_namespace" {
+  depends_on = [
+    time_sleep.wait_for_k8s_api
+  ]
+
+  yaml_body = <<YAML
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: infra-sealed-secret
+YAML
+}
+
+resource "kubectl_manifest" "sealed_secret_master" {
+  depends_on = [
+    time_sleep.wait_for_k8s_api
+  ]
+
+  yaml_body = <<YAML
+apiVersion: v1
+kind: Secret
+metadata:
+  name: custom-master-key
+  namespace: infra-sealed-secret
+  labels:
+    sealedsecrets.bitnami.com/sealed-secrets-key: active
+type: kubernetes.io/tls
+data:
+  tls.crt: |
+    ${indent(4, base64encode(data.aws_ssm_parameter.sealed_secret_cert.value))}
+  tls.key: |
+    ${indent(4, base64encode(data.aws_ssm_parameter.sealed_secret_key.value))}
+YAML
+}
+
+resource "kubectl_manifest" "dex_namespace" {
+  depends_on = [
+    time_sleep.wait_for_k8s_api
+  ]
+
+  yaml_body = <<YAML
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: infra-dex
+YAML
+}
+
+resource "kubectl_manifest" "argocd_namespace" {
+  depends_on = [
+    time_sleep.wait_for_k8s_api
+  ]
+
+  yaml_body = <<YAML
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: infra-argocd
+YAML
+}
+
+resource "kubectl_manifest" "dex_github_connector" {
+  depends_on = [
+    time_sleep.wait_for_k8s_api
+  ]
+
+  yaml_body = yamlencode(jsondecode(file("sealedsecrets/secrets/dex-github-connector.json")))
+}
+
+
+resource "random_password" "dex_argocd_client" {
+  length  = 16
+  special = true
+}
+
+resource "kubectl_manifest" "dex_argocd_client" {
+  depends_on = [
+    time_sleep.wait_for_k8s_api
+  ]
+
+  yaml_body = <<YAML
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dex-argocd-client
+  namespace: infra-argocd
+  labels:
+    app.kubernetes.io/part-of: argocd
+type: Opaque
+data:
+  client-id: ${base64encode("argo")}
+  client-secret: ${base64encode(random_password.dex_argocd_client.result)}
+YAML
+}
+
+resource "kubectl_manifest" "dex_argocd_dex_client" {
+  depends_on = [
+    time_sleep.wait_for_k8s_api
+  ]
+
+  yaml_body = <<YAML
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dex-argocd-client
+  namespace: infra-dex
+type: Opaque
+data:
+  client-id: ${base64encode("argo")}
+  client-secret: ${base64encode(random_password.dex_argocd_client.result)}
+YAML
+}
+
 resource "kubectl_manifest" "clusterrolebinding_oidc" {
   depends_on = [
     time_sleep.wait_for_k8s_api
