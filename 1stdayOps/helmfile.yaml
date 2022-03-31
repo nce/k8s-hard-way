@@ -94,8 +94,8 @@ releases:
         oidc.config: |
           name: Github
           issuer: https://login.ugo-k8s.adorsys-sandbox.aws.adorsys.de/dex/
-          clientID: argo
-          clientSecret: ir1vahtishaiThoceej9aish6raosae2
+          clientID: $dex-argocd-client:client-id
+          clientSecret: $dex-argocd-client:client-secret
           requestedIDTokenClaims:
             groups:
               essential: true
@@ -125,7 +125,13 @@ releases:
 
 - name: dex
   chart: dex/dex
+  namespace: infra-dex
   values:
+  - envFrom:
+    - secretRef:
+        name: dex-github-connector
+    - secretRef:
+        name: dex-argocd-client
   - dex/values.config.yaml
   - replicaCount: 2
   - https:
