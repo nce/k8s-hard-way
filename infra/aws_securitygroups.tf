@@ -1,7 +1,20 @@
 resource "aws_security_group" "controller" {
   vpc_id      = aws_vpc.vpc.id
   description = "Controller Group"
+}
 
+resource "aws_security_group_rule" "k8s_api_to_controller" {
+  description = "All k8s_api from to the controller"
+
+  type      = "ingress"
+  from_port = 6443
+  to_port   = 6443
+  protocol  = "TCP"
+
+  cidr_blocks      = ["0.0.0.0/0"]
+  ipv6_cidr_blocks = ["::/0"]
+
+  security_group_id = aws_security_group.controller.id
 }
 
 resource "aws_security_group_rule" "controller_to_controller" {
@@ -32,9 +45,9 @@ resource "aws_security_group_rule" "bastion_to_controller" {
   description = "All traffic from the bastion to the controller"
 
   type      = "ingress"
-  from_port = 0
-  protocol  = "-1"
-  to_port   = 0
+  from_port = 22
+  to_port   = 22
+  protocol  = "TCP"
 
   security_group_id        = aws_security_group.controller.id
   source_security_group_id = aws_security_group.bastion.id

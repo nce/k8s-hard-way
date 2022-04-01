@@ -102,7 +102,7 @@ resource "tls_cert_request" "k8s_apiserver" {
     "kubernetes.default.svc",
     "kubernetes.default.svc.cluster",
     "kubernetes.default.svc.cluster.local",
-    aws_route53_record.bastion.name
+    aws_route53_record.k8s_api.name
   ]
 
   ip_addresses = concat([

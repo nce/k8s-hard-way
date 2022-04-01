@@ -15,6 +15,18 @@ resource "aws_route53_record" "bastion" {
   records = [aws_instance.bastion.public_ip]
 }
 
+resource "aws_route53_record" "k8s_api" {
+  zone_id = aws_route53_zone.dns.id
+  name    = "api.${aws_route53_zone.dns.name}"
+  type    = "A"
+
+  alias {
+    evaluate_target_health = false
+    name                   = aws_lb.k8s_api.dns_name
+    zone_id                = aws_lb.k8s_api.zone_id
+  }
+}
+
 resource "aws_route53_record" "adorsys_sandbox_aws_adorsys_de_NS" {
   zone_id = data.aws_route53_zone.adorsys_sandbox.id
   name    = aws_route53_zone.dns.name
