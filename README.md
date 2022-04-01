@@ -27,6 +27,11 @@ hacky shell scripts, triggered by cloud-init.
   - [ ] binary checksum verification
   - [ ] `kube-bench` with a reasonable score
   - [ ] https://github.com/aws/amazon-vpc-cni-k8s
+  - [x] Move the bastion LB for the k8s api to `aws_lb`  
+    The Bastion Host has a nginx loadbalancing the k8s-api; This should be
+    replaced by an aws network lb
+  - [ ] Migrate the hacky shell scripts to ignition/afterburner
+
 - Clusteraddons
   - [x] [aws cloud controller manager](https://github.com/kubernetes/cloud-provider-aws) (as external cloud provider in k8s)
   - [x] [aws-lb-controller](https://github.com/kubernetes-sigs/aws-load-balancer-controller) as ingress class
@@ -39,7 +44,7 @@ hacky shell scripts, triggered by cloud-init.
   - [ ] replace ec2 IAM rules with [IRSA](https://aws.amazon.com/blogs/opensource/introducing-fine-grained-iam-roles-service-accounts/)
 - Autoscaling
   - [ ] ...
-  - [ ] scaling of nodes dependend on load
+  - [ ] scaling of nodes dependend on load -> karpenter
 - Application
   - [x] ArgoCD
 
@@ -48,7 +53,9 @@ hacky shell scripts, triggered by cloud-init.
   - [ ] Block aws metadata access from cluster
   - [ ] etcd autodiscovery (etcd in autoscalingroups)
   - [ ] bootstrap tokens
-  - [ ] crossplane
+  - [ ] crossplane vs aws-controllers-k8s
+  - [ ] kyverno vs gatekeeper/opa vs kubevious
+  - [ ] cluster backup -> velero
 
 # Implementation
 ## Hosts
