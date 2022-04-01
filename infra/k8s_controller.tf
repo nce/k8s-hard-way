@@ -223,7 +223,7 @@ resource "null_resource" "k8s_instance_controller_apiserver" {
 
 resource "local_file" "k8s_admin_kubeconfig" {
   content = templatefile("apiserver/adminkubeconfig.sh.tftpl", {
-    cluster_public_dns = aws_route53_record.bastion.name
+    cluster_public_dns = aws_route53_record.k8s_api.name
     dex_login_url      = var.dex_login_url
   })
 
@@ -374,7 +374,6 @@ resource "time_sleep" "wait_for_k8s_api" {
   depends_on = [
     null_resource.k8s_admin_kubeconfig_local,
     null_resource.k8s_instance_controller_apiserver,
-    null_resource.k8s_apilb_bastion,
     aws_security_group.worker,
     aws_security_group.controller,
     aws_security_group.bastion,
