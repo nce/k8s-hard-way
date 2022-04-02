@@ -737,3 +737,55 @@ resource "null_resource" "k8s_service_account" {
 }
 # -- [ service_account cert ] --
 # ------------------------------
+#
+# ---------------------------
+# -- [ irsa webhook cert ] --
+resource "tls_private_key" "k8s_irsa" {
+  algorithm = "RSA"
+  rsa_bits  = "2048"
+}
+resource "tls_cert_request" "k8s_irsa" {
+  key_algorithm   = tls_private_key.k8s_irsa.algorithm
+  private_key_pem = tls_private_key.k8s_irsa.private_key_pem
+
+  dns_names = [
+    "amazon-eks-pod-identity-webhook",
+    "amazon-eks-pod-identity-webhook.kube-system",
+    "amazon-eks-pod-identity-webhook.kube-system.svc",
+    "amazon-eks-pod-identity-webhook.kube-system.svc.local",
+  ]
+
+
+  subject {
+    common_name         = "amazon-eks-pod-identity-webhook.kube-system.svc"
+    organization        = "Kubernetes"
+    country             = "DE"
+    locality            = "Bavaria"
+    organizational_unit = "K8s the hard way"
+  }
+}
+
+resource "tls_locally_signed_cert" "k8s_irsa" {
+  cert_request_pem   = tls_cert_request.k8s_irsa.cert_request_pem
+  ca_key_algorithm   = tls_private_key.k8s_ca.algorithm
+  ca_private_key_pem = tls_private_key.k8s_ca.private_key_pem
+  ca_cert_pem        = tls_self_signed_cert.k8s_ca.cert_pem
+
+  validity_period_hours = 8760
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "cert_signing",
+    "client_auth",
+    "server_auth",
+  ]
+}
+
+
+resource "local_file" "k8s_irsa_cert" {
+  content  = tls_locally_signed_cert.k8s_irsa.cert_pem
+  filename = "../1stdayOps/irsa/amazon-eks-pod-identity.pem"
+}
+# -- [ irsa webhook cert ] --
+# ---------------------------

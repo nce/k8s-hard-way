@@ -178,9 +178,9 @@ resource "local_file" "k8s_apiserver" {
     k8s_version          = var.k8s_version
     controller_instances = var.controller_instances
     etcd_server          = "https://${join(":2379,https://", aws_instance.controller.*.private_ip)}:2379"
-    cluster_private_ip   = aws_instance.bastion.private_ip
     cluster_service_cidr = var.cluster_service_cidr
     encryption_key       = random_id.etcd_encryption_key.b64_std
+    public_cluster_url   = aws_route53_record.k8s_api.name
   })
 
   filename = "./apiserver/generated/controller${count.index}.apiserver.sh"
