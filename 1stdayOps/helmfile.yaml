@@ -65,6 +65,10 @@ releases:
 - name: external-dns
   namespace: kube-system
   chart: external-dns/external-dns
+  values:
+  - serviceAccount:
+      annotations:
+        eks.amazonaws.com/role-arn: arn:aws:iam::571075516563:role/ugo-externaldns
 - name: aws-load-balancer-controller
   namespace: kube-system
   chart: eks/aws-load-balancer-controller

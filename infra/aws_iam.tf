@@ -12,61 +12,10 @@ resource "aws_iam_policy" "policy" {
   policy = file("aws-lb-controller/iam_policy.json")
 }
 
-#resource "aws_iam_user_policy" "ingress_lb_ro" {
-#  user = aws_iam_user.ingress_lb.name
-#
-#  policy = file("aws-lb-controller/iam_policy.json")
-#}
-
 resource "aws_iam_user_policy_attachment" "test-attach" {
   user       = aws_iam_user.ingress_lb.name
   policy_arn = aws_iam_policy.policy.arn
 }
-
-#resource "aws_iam_role_policy_attachment" "test-attach" {
-#  role       = aws_iam_role.role.name
-#  policy_arn = aws_iam_policy.policy.arn
-#}
-#
-#resource "aws_iam_role" "ingress_lb" {
-#  name = "test-role"
-#
-#  assume_role_policy = <<EOF
-#{
-#  "Version": "2012-10-17",
-#  "Statement": [
-#    {
-#      "Action": "sts:AssumeRole",
-#      "Principal": {
-#        "Service": "ec2.amazonaws.com"
-#      },
-#      "Effect": "Allow",
-#      "Sid": ""
-#    }
-#  ]
-#}
-#EOF
-#}
-
-#resource "kubectl_manifest" "aws_iam_token" {
-#
-#  depends_on = [
-#    time_sleep.wait_for_k8s_api
-#  ]
-#
-#  yaml_body = <<YAML
-#apiVersion: v1
-#data:
-#  keyid: ${base64encode(aws_iam_access_key.ingress_lb.id)}
-#  keysecret: ${base64encode(aws_iam_access_key.ingress_lb.secret)}
-#kind: Secret
-#metadata:
-#  name: awscredentials
-#  namespace: kube-system
-#type: Opaque
-#YAML
-#}
-
 
 resource "aws_iam_instance_profile" "aws_cloud_provider_controller" {
   name = "aws_cloud_provider_controller"
@@ -237,42 +186,9 @@ resource "aws_iam_role_policy_attachment" "aws_cloud_provider_worker" {
   policy_arn = aws_iam_policy.aws_cloud_provider_worker.arn
 }
 
-resource "aws_iam_role_policy_attachment" "aws_external_dns" {
-  role       = aws_iam_role.aws_cloud_provider_worker.name
-  policy_arn = aws_iam_policy.external_dns.arn
-}
-resource "aws_iam_role_policy_attachment" "aws_external_dns_controller" {
-  role       = aws_iam_role.aws_cloud_provider_controller.name
-  policy_arn = aws_iam_policy.external_dns.arn
-}
+#resource "aws_iam_role_policy_attachment" "aws_external_dns_controller" {
+#  role       = aws_iam_role.aws_cloud_provider_controller.name
+#  policy_arn = aws_iam_policy.external_dns.arn
+#}
 
-resource "aws_iam_policy" "external_dns" {
-  name = "externalDns"
 
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "route53:ChangeResourceRecordSets"
-      ],
-      "Resource": [
-        "arn:aws:route53:::hostedzone/*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "route53:ListHostedZones",
-        "route53:ListResourceRecordSets"
-      ],
-      "Resource": [
-        "*"
-      ]
-    }
-  ]
-}
-EOF
-}
