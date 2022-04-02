@@ -34,14 +34,18 @@ hacky shell scripts, triggered by cloud-init.
 
 - Clusteraddons
   - [x] [aws cloud controller manager](https://github.com/kubernetes/cloud-provider-aws) (as external cloud provider in k8s)
-  - [x] [aws-lb-controller](https://github.com/kubernetes-sigs/aws-load-balancer-controller) as ingress class
-  - [x] [external_dns](https://github.com/kubernetes-sigs/external-dns) with route53 access
+  - [x] [aws-lb-controller](https://github.com/kubernetes-sigs/aws-load-balancer-controller) as ingress class  
+    Using IRSA for aws management access
+  - [x] [external_dns](https://github.com/kubernetes-sigs/external-dns) with route53 access  
+    Using IRSA for aws management access
   - [x] [sealed-secrets](https://github.com/bitnami-labs/sealed-secrets) as secretstorage  
     With external private Key (from aws ssm parameter store) for external secrets
     like Github tokens, which should surive clusterrebuilds
+  - [x] [aws-eks-pod-identity-webhook](https://github.com/aws/amazon-eks-pod-identity-webhook) for IRSA  
+    Mutating webhook to allow SAs using aws IAM
 - IdentityManagement
   - [x] Dex as idP with Github Backend for all login related Toosl (`kubectl`, argoCD)
-  - [ ] replace ec2 IAM rules with [IRSA](https://aws.amazon.com/blogs/opensource/introducing-fine-grained-iam-roles-service-accounts/)
+  - [x] Implement [IRSA](https://aws.amazon.com/blogs/opensource/introducing-fine-grained-iam-roles-service-accounts/) for aws acces
 - Autoscaling
   - [ ] ...
   - [ ] scaling of nodes dependend on load -> karpenter
@@ -56,6 +60,7 @@ hacky shell scripts, triggered by cloud-init.
   - [ ] crossplane vs aws-controllers-k8s
   - [ ] kyverno vs gatekeeper/opa vs kubevious
   - [ ] cluster backup -> velero
+  - [ ] refactor terraform in module groups
 
 # Implementation
 ## Hosts
