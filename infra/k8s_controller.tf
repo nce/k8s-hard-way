@@ -178,9 +178,9 @@ resource "local_file" "k8s_apiserver" {
     k8s_version          = var.k8s_version
     controller_instances = var.controller_instances
     etcd_server          = "https://${join(":2379,https://", aws_instance.controller.*.private_ip)}:2379"
-    cluster_private_ip   = aws_instance.bastion.private_ip
     cluster_service_cidr = var.cluster_service_cidr
     encryption_key       = random_id.etcd_encryption_key.b64_std
+    public_cluster_url   = aws_route53_record.k8s_api.name
   })
 
   filename = "./apiserver/generated/controller${count.index}.apiserver.sh"
@@ -434,25 +434,6 @@ subjects:
   - apiGroup: rbac.authorization.k8s.io
     kind: User
     name: kubernetes
-YAML
-}
-
-resource "kubectl_manifest" "awscredentials_secret" {
-  depends_on = [
-    time_sleep.wait_for_k8s_api
-  ]
-
-  yaml_body = <<YAML
-apiVersion: v1
-data:
-  keyid: ${base64encode(aws_iam_access_key.ingress_lb.id)}
-  keysecret: ${base64encode(aws_iam_access_key.ingress_lb.secret)}
-kind: Secret
-metadata:
-  annotations:
-  name: awscredentials
-  namespace: kube-system
-type: Opaque
 YAML
 }
 

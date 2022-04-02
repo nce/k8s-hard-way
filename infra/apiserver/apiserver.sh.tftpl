@@ -64,7 +64,9 @@ ExecStart=/usr/local/bin/kube-apiserver \\
   --runtime-config='api/all=true' \\
   --service-account-key-file=/var/lib/kubernetes/service-account.pem \\
   --service-account-signing-key-file=/var/lib/kubernetes/service-account-key.pem \\
-  --service-account-issuer=https://${cluster_private_ip}:6443 \\
+  --service-account-jwks-uri=https://${public_cluster_url}/openid/v1/jwks \\
+  --service-account-issuer=https://${public_cluster_url} \\
+  --api-audiences=sts.amazonaws.com \\
   --service-cluster-ip-range=${cluster_service_cidr} \\
   --service-node-port-range=30000-32767 \\
   --tls-cert-file=/var/lib/kubernetes/kubernetes.pem \\
@@ -83,6 +85,7 @@ RestartSec=5
 [Install]
 WantedBy=multi-user.target
 EOF
+
 
 cat <<EOF | tee /var/lib/kubernetes/encryption-config.yaml
 kind: EncryptionConfig
