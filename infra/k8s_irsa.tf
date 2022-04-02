@@ -109,3 +109,38 @@ data:
     ${indent(4, base64encode(tls_private_key.k8s_irsa.private_key_pem))}
 YAML
 }
+
+
+resource "aws_iam_role_policy_attachment" "aws_lb_controller" {
+  role       = aws_iam_role.aws_lb_controller.name
+  policy_arn = aws_iam_policy.aws_lb_controller.arn
+}
+
+resource "aws_iam_policy" "aws_lb_controller" {
+  name   = "AWSLoadBalancerControllerIAMPolicy"
+  policy = file("aws-lb-controller/iam_policy.json")
+}
+
+resource "aws_iam_role" "aws_lb_controller" {
+  name               = "ugo-awslbcontroller"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::571075516563:oidc-provider/api.ugo-k8s.adorsys-sandbox.aws.adorsys.de"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "api.ugo-k8s.adorsys-sandbox.aws.adorsys.de:aud": "sts.amazonaws.com",
+          "api.ugo-k8s.adorsys-sandbox.aws.adorsys.de:sub": "system:serviceaccount:kube-system:aws-load-balancer-controller"
+        }
+      }
+    }
+  ]
+}
+EOF
+}

@@ -1,26 +1,3 @@
-resource "aws_iam_user" "ingress_lb" {
-  name = "ugo-k8s-ingress"
-  path = "/"
-}
-
-resource "aws_iam_access_key" "ingress_lb" {
-  user = aws_iam_user.ingress_lb.name
-}
-
-resource "aws_iam_policy" "policy" {
-  name   = "AWSLoadBalancerControllerIAMPolicy"
-  policy = file("aws-lb-controller/iam_policy.json")
-}
-
-resource "aws_iam_user_policy_attachment" "test-attach" {
-  user       = aws_iam_user.ingress_lb.name
-  policy_arn = aws_iam_policy.policy.arn
-}
-
-resource "aws_iam_instance_profile" "aws_cloud_provider_controller" {
-  name = "aws_cloud_provider_controller"
-  role = aws_iam_role.aws_cloud_provider_controller.name
-}
 
 resource "aws_iam_role" "aws_cloud_provider_controller" {
   name = "aws_cloud_provider_controller"
@@ -123,11 +100,10 @@ resource "aws_iam_role_policy_attachment" "aws_cloud_provider_controller" {
   policy_arn = aws_iam_policy.aws_cloud_provider_controller.arn
 }
 
-
-
-
-
-
+resource "aws_iam_instance_profile" "aws_cloud_provider_controller" {
+  name = "aws_cloud_provider_controller"
+  role = aws_iam_role.aws_cloud_provider_controller.name
+}
 
 resource "aws_iam_instance_profile" "aws_cloud_provider_worker" {
   name = "aws_cloud_provider_worker"
@@ -185,10 +161,4 @@ resource "aws_iam_role_policy_attachment" "aws_cloud_provider_worker" {
   role       = aws_iam_role.aws_cloud_provider_worker.name
   policy_arn = aws_iam_policy.aws_cloud_provider_worker.arn
 }
-
-#resource "aws_iam_role_policy_attachment" "aws_external_dns_controller" {
-#  role       = aws_iam_role.aws_cloud_provider_controller.name
-#  policy_arn = aws_iam_policy.external_dns.arn
-#}
-
 

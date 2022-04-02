@@ -80,22 +80,9 @@ releases:
   values:
     - image:
         repository: amazon/aws-alb-ingress-controller
-    - env:
-        # dirty hack to inject the credentials as secret
-        name: >-
-          b"
-                  - name: AWS_ACCESS_KEY_ID
-                    valueFrom:
-                      secretKeyRef:
-                        name: awscredentials
-                        key: keyid
-                        optional: false
-                  - name: AWS_SECRET_ACCESS_KEY
-                    valueFrom:
-                      secretKeyRef:
-                        name: awscredentials
-                        key: keysecret
-                        optional: false #
+    - serviceAccount:
+        annotations:
+          eks.amazonaws.com/role-arn: arn:aws:iam::571075516563:role/ugo-awslbcontroller
 - name: sealed-secrets
   chart: sealed-secrets/sealed-secrets
   values:

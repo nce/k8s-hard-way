@@ -437,25 +437,6 @@ subjects:
 YAML
 }
 
-resource "kubectl_manifest" "awscredentials_secret" {
-  depends_on = [
-    time_sleep.wait_for_k8s_api
-  ]
-
-  yaml_body = <<YAML
-apiVersion: v1
-data:
-  keyid: ${base64encode(aws_iam_access_key.ingress_lb.id)}
-  keysecret: ${base64encode(aws_iam_access_key.ingress_lb.secret)}
-kind: Secret
-metadata:
-  annotations:
-  name: awscredentials
-  namespace: kube-system
-type: Opaque
-YAML
-}
-
 data "aws_ssm_parameter" "sealed_secret_cert" {
   name = "/ugo-kubernetes-the-hard-way/sealedsecrets/sealedsecrets.crt"
 }
