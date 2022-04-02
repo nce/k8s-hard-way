@@ -1,6 +1,8 @@
 repositories:
 #- name: stable
 #url: https://charts.helm.sh/stable
+- name: jkroepke
+  url: https://jkroepke.github.io/helm-charts/
 - name: aws-cloud-controller-manager
   url: https://kubernetes.github.io/cloud-provider-aws
 - name: coredns
@@ -21,6 +23,21 @@ helmDefaults:
   wait: true
 
 releases:
+- name: amazon-eks-pod-identity-webhook
+  chart: jkroepke/amazon-eks-pod-identity-webhook
+  labels:
+    name: irsa
+  namespace: kube-system
+  values:
+    - config:
+        defaultAwsRegion: eu-central-1
+    - pki:
+        certManager:
+          enabled: false
+        existingSecret: irsa-webhook
+  set:
+    - name: pki.caBundle
+      file: irsa/amazon-eks-pod-identity.pem
 - name: aws-cloud-controller-manager
   namespace: kube-system 
   chart: aws-cloud-controller-manager/aws-cloud-controller-manager
