@@ -14,8 +14,11 @@ This is an aws based k8s-the-hard-way setup (inspired by [Kelsey Hightower](http
 hacky shell scripts, triggered by cloud-init.
 
 ---
-> The project developed itself to a playground for all of my k8s/aws tech related curiosity.
+> The project evolved to a playground for all of my k8s/aws tech related curiosity.
 ---
+
+Reference: 
+https://github.com/kubernetes/kubeadm/blob/main/docs/design/design_v1.10.md
 
 # Roadmap
 - Clustersetup
@@ -30,7 +33,9 @@ hacky shell scripts, triggered by cloud-init.
   - [x] Move the bastion LB for the k8s api to `aws_lb`  
     The Bastion Host has a nginx loadbalancing the k8s-api; This should be
     replaced by an aws network lb
-  - [ ] Migrate the hacky shell scripts to ignition/afterburner
+  - [ ] Migrate the hacky shell scripts to ignition  
+    https://github.com/coreos/container-linux-config-transpiler/blob/master/doc/configuration.md
+
 
 - Clusteraddons
   - [x] [aws cloud controller manager](https://github.com/kubernetes/cloud-provider-aws) (as external cloud provider in k8s)
@@ -39,7 +44,7 @@ hacky shell scripts, triggered by cloud-init.
   - [x] [external_dns](https://github.com/kubernetes-sigs/external-dns) with route53 access  
     Using IRSA for aws management access
   - [x] [sealed-secrets](https://github.com/bitnami-labs/sealed-secrets) as secretstorage  
-    With external private Key (from aws ssm parameter store) for external secrets
+    With external private Key (from aws ssm parameter store) for global secrets
     like Github tokens, which should surive clusterrebuilds
   - [x] [aws-eks-pod-identity-webhook](https://github.com/aws/amazon-eks-pod-identity-webhook) for IRSA  
     Mutating webhook to allow SAs using aws IAM
@@ -49,6 +54,7 @@ hacky shell scripts, triggered by cloud-init.
 - Autoscaling
   - [ ] ...
   - [ ] scaling of nodes dependend on load -> karpenter
+  - [ ] spot instances
 - Application
   - [x] ArgoCD
 
@@ -61,6 +67,9 @@ hacky shell scripts, triggered by cloud-init.
   - [ ] kyverno vs gatekeeper/opa vs kubevious
   - [ ] cluster backup -> velero
   - [ ] refactor terraform in module groups
+  - [ ] https://kubernetes.io/blog/2021/04/21/graceful-node-shutdown-beta/
+  - [ ] aws ssm instead of ssh
+  - [ ] logging: cloudwatch
 
 # Implementation
 ## Hosts
