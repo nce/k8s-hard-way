@@ -29,3 +29,7 @@ variable "aws_vpc_id" {
 variable "aws_security_group_ids" {
   type = list(any)
 }
+
+variable "aws_iam_role_policy_attachments" {
+  type = list(string)
+}

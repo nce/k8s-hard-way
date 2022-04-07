@@ -20,7 +20,7 @@ resource "aws_instance" "instance" {
   vpc_security_group_ids      = var.aws_security_group_ids
   associate_public_ip_address = true
 
-  # iam_instance_profile = aws_iam_instance_profile.this.name
+  iam_instance_profile = module.instanceprofile.iam_instance_profile_name
 
   metadata_options {
     http_put_response_hop_limit = 1

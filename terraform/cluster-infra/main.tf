@@ -1,3 +1,9 @@
+module "systemsmanager" {
+  source = "./modules/systemsmanager"
+
+  k8s_cluster_name = var.k8s_cluster_name
+}
+
 module "networking" {
   source = "./modules/networking"
 
@@ -26,4 +32,6 @@ module "controlplane" {
 
   aws_instance_type  = var.aws_instance_type
   aws_ssh_public_key = var.ssh_public_key
+
+  aws_iam_role_policy_attachments = [module.systemsmanager.iam_role_policy_arn]
 }
