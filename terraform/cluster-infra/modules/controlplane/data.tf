@@ -8,4 +8,3 @@ data "aws_availability_zone" "all" {
   name = each.key
 }
 
-

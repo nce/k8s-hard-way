@@ -1,6 +1,6 @@
 locals {
-  public_cidr  = cidrsubnet(var.vpc_cidr, 1, 0)
-  private_cidr = cidrsubnet(var.vpc_cidr, 1, 1)
+  public_cidr  = cidrsubnet(var.aws_vpc_cidr, 1, 0)
+  private_cidr = cidrsubnet(var.aws_vpc_cidr, 1, 1)
 }
 
 variable "az_mapping" {
@@ -31,8 +31,8 @@ resource "aws_subnet" "public" {
   cidr_block        = cidrsubnet(local.public_cidr, 3, var.az_mapping[each.value.name_suffix])
 
   tags = {
-    "kubernetes.io/role/elb"                    = "1"
-    "kubernetes.io/cluster/${var.cluster_name}" = "owned"
+    "kubernetes.io/role/elb"                        = "1"
+    "kubernetes.io/cluster/${var.k8s_cluster_name}" = "owned"
   }
 }
 
@@ -44,7 +44,7 @@ resource "aws_subnet" "private" {
   cidr_block        = cidrsubnet(local.private_cidr, 3, var.az_mapping[each.value.name_suffix])
 
   tags = {
-    "kubernetes.io/role/elb"                    = "1"
-    "kubernetes.io/cluster/${var.cluster_name}" = "owned"
+    "kubernetes.io/role/elb"                        = "1"
+    "kubernetes.io/cluster/${var.k8s_cluster_name}" = "owned"
   }
 }
