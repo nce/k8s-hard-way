@@ -17,7 +17,7 @@ module "securitygroups" {
   vpc_id = module.networking.vpc_id
 }
 
-module "controlplane_clusterfiles" {
+module "clusterfiles" {
   source = "./modules/clusterfiles"
 
   k8s_cluster_name = var.k8s_cluster_name
@@ -28,8 +28,12 @@ module "controlplane_userdata" {
 
   k8s_cluster_name = var.k8s_cluster_name
 
+  k8s_kubernetes_version = var.k8s_version
+  k8s_kubelet_sha512     = var.k8s_kubelet_sha512
+  k8s_kubectl_sha512     = var.k8s_kubectl_sha512
+
   files = merge(
-    module.controlplane_clusterfiles.controlplane_configs
+    module.clusterfiles.controlplane_configs
   )
 }
 

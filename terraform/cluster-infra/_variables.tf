@@ -40,6 +40,20 @@ variable "aws_vpc_cidr" {
   default = "10.10.0.0/16"
 }
 
+variable "k8s_kubectl_sha512" {
+  description = "Checksum of kubectl"
+  type        = string
+
+  default = "f06216fc596b831cee2a4946e5442454685838c1542f3aa93d0f52bb25433f670a3451e0188ddf2049f37026d1cf5bbfe8ec6eb2866daf81cfbe3073a9984ea9"
+}
+
+variable "k8s_kubelet_sha512" {
+  description = "Checksum of kubelet"
+  type        = string
+
+  default = "3a103d584fff10d3f2378f6f654aee761977514f4a995f8f58966e5ffaa4a7dfbb24aeed33ef9fa09280c43ba8b87b8772e1f349ef529c67822dcfa68941a688"
+}
+#
 #variable "kubernetes_api_extern" {
 #  description = "api Name of the k8sapi"
 #  type        = string
@@ -56,20 +70,7 @@ variable "aws_vpc_cidr" {
 #
 #
 #
-#variable "kubectl_sha512" {
-#  description = "Checksum of kubectl"
-#  type        = string
-#
-#  default = "f06216fc596b831cee2a4946e5442454685838c1542f3aa93d0f52bb25433f670a3451e0188ddf2049f37026d1cf5bbfe8ec6eb2866daf81cfbe3073a9984ea9"
-#}
-#
-#variable "kubelet_sha512" {
-#  description = "Checksum of kubelet"
-#  type        = string
-#
-#  default = "3a103d584fff10d3f2378f6f654aee761977514f4a995f8f58966e5ffaa4a7dfbb24aeed33ef9fa09280c43ba8b87b8772e1f349ef529c67822dcfa68941a688"
-#}
-#
+
 #variable "etcd_version" {
 #  description = "Version of etcd image"
 #  type        = string
