@@ -17,6 +17,8 @@ resource "aws_instance" "instance" {
     ]
   ]
 
+  user_data = var.user_data
+
   vpc_security_group_ids      = var.aws_security_group_ids
   associate_public_ip_address = true
 

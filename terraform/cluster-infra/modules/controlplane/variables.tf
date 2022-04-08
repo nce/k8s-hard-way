@@ -33,3 +33,8 @@ variable "aws_security_group_ids" {
 variable "aws_iam_role_policy_attachments" {
   type = list(string)
 }
+
+variable "user_data" {
+  type = string
+}
+
