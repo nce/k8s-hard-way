@@ -17,6 +17,22 @@ module "securitygroups" {
   vpc_id = module.networking.vpc_id
 }
 
+module "controlplane_clusterfiles" {
+  source = "./modules/clusterfiles"
+
+  k8s_cluster_name = var.k8s_cluster_name
+}
+
+module "controlplane_userdata" {
+  source = "./modules/userdata"
+
+  k8s_cluster_name = var.k8s_cluster_name
+
+  files = merge(
+    module.controlplane_clusterfiles.controlplane_configs
+  )
+}
+
 module "controlplane" {
   source = "./modules/controlplane"
 
@@ -33,5 +49,10 @@ module "controlplane" {
   aws_instance_type  = var.aws_instance_type
   aws_ssh_public_key = var.ssh_public_key
 
-  aws_iam_role_policy_attachments = [module.systemsmanager.iam_role_policy_arn]
+  user_data = module.controlplane_userdata.user_data
+
+  aws_iam_role_policy_attachments = [
+    module.systemsmanager.iam_role_policy_arn,
+    module.controlplane_userdata.ignition_s3_policy_arn
+  ]
 }
