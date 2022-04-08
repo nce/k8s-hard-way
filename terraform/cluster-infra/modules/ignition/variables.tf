@@ -5,3 +5,7 @@ variable "k8s_cluster_name" {
 variable "files" {
   type = map(object({ content = string, user = string, group = string, mode = string }))
 }
+
+variable "snippets" {
+  type = list(string)
+}

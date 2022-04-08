@@ -26,18 +26,12 @@ EOF
 
 }
 
-#data "ct_config" "user_data" {
-#  content      = local.user_data
-#  strict       = true
-#  pretty_print = false
-#}
-
 data "ct_config" "ignition" {
   content      = jsonencode({})
   strict       = true
   pretty_print = true
 
-  snippets = concat(local.file_snippets)
+  snippets = concat(local.file_snippets, var.snippets)
 
   platform = "ec2"
 }
