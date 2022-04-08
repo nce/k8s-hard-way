@@ -1,11 +1,11 @@
 locals {
   files_controlplane_configs = {
-    for filename in fileset("${path.module}/files/", "**/*") : "/${filename}" => {
+    for filename in fileset("${path.module}/files/controlplane/", "**/*") : "/${filename}" => {
       mode  = "0644"
       user  = "root"
       group = "root"
 
-      content = templatefile("${path.module}/files/${filename}", {
+      content = templatefile("${path.module}/files/controlplane/${filename}", {
         k8s_cluster_name = var.k8s_cluster_name
 
         etcd_version          = "123"
