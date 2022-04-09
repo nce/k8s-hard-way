@@ -17,10 +17,20 @@ module "securitygroups" {
   vpc_id = module.networking.vpc_id
 }
 
+module "pki" {
+  source = "./modules/pki"
+
+  k8s_api_extern = var.k8s_api_extern
+  k8s_service_ip = var.k8s_service_ip
+
+}
+
 module "clusterfiles" {
   source = "./modules/clusterfiles"
 
   k8s_cluster_name = var.k8s_cluster_name
+
+  k8s_ca_crt = module.pki.ca_crt
 }
 
 module "controlplane_userdata" {

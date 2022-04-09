@@ -53,23 +53,23 @@ variable "k8s_kubelet_sha512" {
 
   default = "3a103d584fff10d3f2378f6f654aee761977514f4a995f8f58966e5ffaa4a7dfbb24aeed33ef9fa09280c43ba8b87b8772e1f349ef529c67822dcfa68941a688"
 }
-#
-#variable "kubernetes_api_extern" {
-#  description = "api Name of the k8sapi"
-#  type        = string
-#
-#  default = "api.ugo-k8s.adorsys-sandbox.aws.adorsys.de"
-#}
-#
-#variable "kubernetes_service_ip" {
-#  description = "Ip Adress of the default kuberentes svc"
-#  type        = string
-#
-#  default = "10.32.0.1"
-#}
-#
-#
-#
+
+variable "k8s_api_extern" {
+  description = "api Name of the k8sapi"
+  type        = string
+
+  default = "api.ugo-k8s.adorsys-sandbox.aws.adorsys.de"
+}
+
+variable "k8s_service_ip" {
+  description = "Ip Adress of the default kuberentes svc"
+  type        = string
+
+  default = "10.32.0.1"
+}
+
+
+
 
 #variable "etcd_version" {
 #  description = "Version of etcd image"
