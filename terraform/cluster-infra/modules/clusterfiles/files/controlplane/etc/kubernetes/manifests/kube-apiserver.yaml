@@ -40,8 +40,6 @@ spec:
         - --oidc-username-claim=sub
         - --oidc-username-prefix="oidc:"
         - --profiling=false
-        - --proxy-client-cert-file=/etc/kubernetes/pki/front-proxy-client.crt
-        - --proxy-client-key-file=/etc/kubernetes/pki/front-proxy-client.key
         - --request-timeout=300s
         - --requestheader-allowed-names=front-proxy-client
         - --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt

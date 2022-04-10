@@ -22,7 +22,6 @@ resource "tls_cert_request" "k8s_apiserver" {
   ip_addresses = [
     var.k8s_service_ip
   ]
-
 }
 
 resource "tls_locally_signed_cert" "k8s_apiserver" {

@@ -30,7 +30,22 @@ module "clusterfiles" {
 
   k8s_cluster_name = var.k8s_cluster_name
 
-  k8s_ca_crt = module.pki.ca_crt
+  etcd_version     = var.etcd_version
+  k8s_version      = var.k8s_version
+  k8s_cluster_dns  = var.k8s_cluster_dns
+  k8s_api_extern   = var.k8s_api_extern
+  k8s_service_cidr = var.k8s_service_cidr
+
+  k8s_pki_ca_crt                    = module.pki.ca_crt
+  k8s_pki_ca_key                    = module.pki.ca_key
+  k8s_pki_apiserver_etcd_client_key = module.pki.k8s_apiserver_etcd_client_key
+  k8s_pki_apiserver_etcd_client_crt = module.pki.k8s_apiserver_etcd_client_crt
+  etcd_pki_ca_key                   = module.pki.etcd_ca_key
+  etcd_pki_ca_crt                   = module.pki.etcd_ca_crt
+  k8s_pki_serviceaccount_pub        = module.pki.k8s_serviceaccount_pub
+  k8s_pki_serviceaccount_key        = module.pki.k8s_serviceaccount_key
+  k8s_pki_apiserver_crt             = module.pki.k8s_apiserver_crt
+  k8s_pki_apiserver_key             = module.pki.k8s_apiserver_key
 }
 
 module "controlplane_userdata" {

@@ -68,16 +68,27 @@ variable "k8s_service_ip" {
   default = "10.32.0.1"
 }
 
+variable "k8s_service_cidr" {
+  description = "CIDR of k8s services"
+  type        = string
 
+  default = "10.32.0.0/24"
+}
 
+variable "etcd_version" {
+  description = "Version of etcd image"
+  type        = string
 
-#variable "etcd_version" {
-#  description = "Version of etcd image"
-#  type        = string
-#
-#  # https://quay.io/repository/coreos/etcd?tab=tags
-#  default = "3.5.2"
-#}
+  # https://quay.io/repository/coreos/etcd?tab=tags
+  default = "3.5.2"
+}
+
+variable "k8s_cluster_dns" {
+  description = "IP of dns server"
+  type        = string
+
+  default = "10.32.0.53"
+}
 #
 #variable "k8s_pod_cidr" {
 #  description = "CIDR of all pods in the cluster"
@@ -86,13 +97,7 @@ variable "k8s_service_ip" {
 #  default = "10.200.0.0/16"
 #}
 #
-#variable "k8s_cluster_dns" {
-#  description = "CIDR of all pods in the cluster"
-#  type        = string
-#
-#  default = "10.32.0.53"
-#}
-#
+
 #
 #
 #variable "aws_controlplane_instance_type" {

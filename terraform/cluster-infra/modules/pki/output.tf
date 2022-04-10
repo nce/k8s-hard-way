@@ -20,7 +20,6 @@ output "k8s_apiserver_etcd_client_key" {
 
 output "k8s_apiserver_etcd_client_crt" {
   value = tls_locally_signed_cert.k8s_apiserver_etcd_client.cert_pem
-
 }
 
 output "k8s_serviceaccount_pub" {
@@ -37,5 +36,4 @@ output "k8s_apiserver_key" {
 
 output "k8s_apiserver_crt" {
   value = tls_locally_signed_cert.k8s_apiserver.cert_pem
-
 }
