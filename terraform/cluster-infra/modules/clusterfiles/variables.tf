@@ -22,6 +22,10 @@ variable "k8s_service_cidr" {
   type = string
 }
 
+variable "etcd_discovery_domain" {
+  type = string
+}
+
 variable "k8s_pki_ca_crt" {
   type = string
 }
@@ -38,11 +42,35 @@ variable "etcd_pki_ca_crt" {
   type = string
 }
 
+variable "etcd_pki_peer_key" {
+  type = string
+}
+
+variable "etcd_pki_peer_crt" {
+  type = string
+}
+
+variable "etcd_pki_server_key" {
+  type = string
+}
+
+variable "etcd_pki_server_crt" {
+  type = string
+}
+
 variable "k8s_pki_apiserver_etcd_client_key" {
   type = string
 }
 
 variable "k8s_pki_apiserver_etcd_client_crt" {
+  type = string
+}
+
+variable "k8s_pki_apiserver_kubelet_client_key" {
+  type = string
+}
+
+variable "k8s_pki_apiserver_kubelet_client_crt" {
   type = string
 }
 
@@ -61,3 +89,5 @@ variable "k8s_pki_apiserver_key" {
 variable "k8s_pki_apiserver_crt" {
   type = string
 }
+
+

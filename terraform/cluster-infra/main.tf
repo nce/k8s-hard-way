@@ -30,22 +30,29 @@ module "clusterfiles" {
 
   k8s_cluster_name = var.k8s_cluster_name
 
-  etcd_version     = var.etcd_version
-  k8s_version      = var.k8s_version
-  k8s_cluster_dns  = var.k8s_cluster_dns
-  k8s_api_extern   = var.k8s_api_extern
-  k8s_service_cidr = var.k8s_service_cidr
+  etcd_version          = var.etcd_version
+  etcd_discovery_domain = var.etcd_discovery_domain
+  k8s_version           = var.k8s_version
+  k8s_cluster_dns       = var.k8s_cluster_dns
+  k8s_api_extern        = var.k8s_api_extern
+  k8s_service_cidr      = var.k8s_service_cidr
 
-  k8s_pki_ca_crt                    = module.pki.ca_crt
-  k8s_pki_ca_key                    = module.pki.ca_key
-  k8s_pki_apiserver_etcd_client_key = module.pki.k8s_apiserver_etcd_client_key
-  k8s_pki_apiserver_etcd_client_crt = module.pki.k8s_apiserver_etcd_client_crt
-  etcd_pki_ca_key                   = module.pki.etcd_ca_key
-  etcd_pki_ca_crt                   = module.pki.etcd_ca_crt
-  k8s_pki_serviceaccount_pub        = module.pki.k8s_serviceaccount_pub
-  k8s_pki_serviceaccount_key        = module.pki.k8s_serviceaccount_key
-  k8s_pki_apiserver_crt             = module.pki.k8s_apiserver_crt
-  k8s_pki_apiserver_key             = module.pki.k8s_apiserver_key
+  k8s_pki_ca_crt                       = module.pki.ca_crt
+  k8s_pki_ca_key                       = module.pki.ca_key
+  k8s_pki_apiserver_etcd_client_key    = module.pki.k8s_apiserver_etcd_client_key
+  k8s_pki_apiserver_etcd_client_crt    = module.pki.k8s_apiserver_etcd_client_crt
+  k8s_pki_apiserver_kubelet_client_key = module.pki.k8s_apiserver_kubelet_client_key
+  k8s_pki_apiserver_kubelet_client_crt = module.pki.k8s_apiserver_kubelet_client_crt
+  etcd_pki_ca_key                      = module.pki.etcd_ca_key
+  etcd_pki_ca_crt                      = module.pki.etcd_ca_crt
+  etcd_pki_peer_crt                    = module.pki.etcd_peer_crt
+  etcd_pki_peer_key                    = module.pki.etcd_peer_key
+  etcd_pki_server_crt                  = module.pki.etcd_server_crt
+  etcd_pki_server_key                  = module.pki.etcd_server_key
+  k8s_pki_serviceaccount_pub           = module.pki.k8s_serviceaccount_pub
+  k8s_pki_serviceaccount_key           = module.pki.k8s_serviceaccount_key
+  k8s_pki_apiserver_crt                = module.pki.k8s_apiserver_crt
+  k8s_pki_apiserver_key                = module.pki.k8s_apiserver_key
 }
 
 module "controlplane_userdata" {
@@ -60,6 +67,13 @@ module "controlplane_userdata" {
   files = merge(
     module.clusterfiles.controlplane_configs
   )
+}
+
+module "etcd_dns_discovery" {
+  source = "./modules/etcddnsdiscovery"
+
+  vpc_id                = module.networking.vpc_id
+  etcd_discovery_domain = var.etcd_discovery_domain
 }
 
 module "controlplane" {
@@ -84,4 +98,7 @@ module "controlplane" {
     module.systemsmanager.iam_role_policy_arn,
     module.controlplane_userdata.ignition_s3_policy_arn
   ]
+
+  etcd_discovery_zone_id = module.etcd_dns_discovery.zone_id
+  etcd_discovery_domain  = var.etcd_discovery_domain
 }

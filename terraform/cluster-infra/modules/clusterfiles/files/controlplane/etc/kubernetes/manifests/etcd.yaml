@@ -15,12 +15,12 @@ spec:
       imagePullPolicy: IfNotPresent
       command:
         - etcd
-        - --name=${etcd_peer_name}
-        - --initial-advertise-peer-urls=https://${etcd_peer_name}:2380
+        - --name=${etcd_peer_name}.${etcd_discovery_domain}
+        - --initial-advertise-peer-urls=https://${etcd_peer_name}.${etcd_discovery_domain}:2380
         - --listen-client-urls=https://$(POD_IP):2379,https://127.0.0.1:2379
         - --listen-peer-urls=https://$(POD_IP):2380
         - --listen-metrics-urls=http://127.0.0.1:2381
-        - --advertise-client-urls=https://${etcd_peer_name}:2379
+        - --advertise-client-urls=https://${etcd_peer_name}.${etcd_discovery_domain}:2379
         - --data-dir=/var/lib/etcd/
         - --cert-file=/etc/kubernetes/pki/etcd/server.crt
         - --key-file=/etc/kubernetes/pki/etcd/server.key

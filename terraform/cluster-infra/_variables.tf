@@ -19,6 +19,13 @@ variable "k8s_controller_count" {
   default = 1
 }
 
+variable "etcd_discovery_domain" {
+  description = "Internal domain for the etcd dns discovery"
+  type        = string
+
+  default = "ugo-k8s.etcd.svc"
+}
+
 variable "aws_instance_type" {
   description = "AWS Instance type of the controller"
   type        = string

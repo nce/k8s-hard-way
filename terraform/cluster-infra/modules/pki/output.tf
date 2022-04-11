@@ -37,3 +37,27 @@ output "k8s_apiserver_key" {
 output "k8s_apiserver_crt" {
   value = tls_locally_signed_cert.k8s_apiserver.cert_pem
 }
+
+output "k8s_apiserver_kubelet_client_key" {
+  value = tls_private_key.k8s_apiserver_kubelet_client.private_key_pem
+}
+
+output "k8s_apiserver_kubelet_client_crt" {
+  value = tls_locally_signed_cert.k8s_apiserver_kubelet_client.cert_pem
+}
+
+output "etcd_peer_crt" {
+  value = tls_locally_signed_cert.k8s_etcd_peer.cert_pem
+}
+
+output "etcd_peer_key" {
+  value = tls_private_key.k8s_etcd_peer.private_key_pem
+}
+
+output "etcd_server_crt" {
+  value = tls_locally_signed_cert.k8s_etcd_server.cert_pem
+}
+
+output "etcd_server_key" {
+  value = tls_private_key.k8s_etcd_server.private_key_pem
+}

@@ -10,8 +10,8 @@ locals {
           k8s_cluster_name = var.k8s_cluster_name
 
           etcd_version          = var.etcd_version
-          etcd_peer_name        = "hello1"
-          etcd_discovery_domain = "foobar"
+          etcd_peer_name        = "etcd0"
+          etcd_discovery_domain = var.etcd_discovery_domain
 
           # kube-apiserver
           controller_count        = 1
@@ -85,6 +85,42 @@ locals {
         group   = "root"
         mode    = "0600"
         content = var.k8s_pki_serviceaccount_key
+      }
+      "/etc/kubernetes/pki/etcd/server.key" = {
+        user    = "etcd"
+        group   = "etcd"
+        mode    = "0600"
+        content = var.etcd_pki_server_key
+      }
+      "/etc/kubernetes/pki/etcd/server.crt" = {
+        user    = "etcd"
+        group   = "etcd"
+        mode    = "0644"
+        content = var.etcd_pki_server_crt
+      }
+      "/etc/kubernetes/pki/etcd/peer.key" = {
+        user    = "etcd"
+        group   = "etcd"
+        mode    = "0600"
+        content = var.etcd_pki_peer_key
+      }
+      "/etc/kubernetes/pki/etcd/peer.crt" = {
+        user    = "etcd"
+        group   = "etcd"
+        mode    = "0644"
+        content = var.etcd_pki_peer_crt
+      }
+      "/etc/kubernetes/pki/apiserver-kubelet-client.key" = {
+        user    = "root"
+        group   = "root"
+        mode    = "0600"
+        content = var.k8s_pki_apiserver_kubelet_client_key
+      }
+      "/etc/kubernetes/pki/apiserver-kubelet-client.crt" = {
+        user    = "root"
+        group   = "root"
+        mode    = "0644"
+        content = var.k8s_pki_apiserver_kubelet_client_crt
       }
       "/var/lib/kubelet/bootstrap-kubeconfig" = {
         user    = "root"
