@@ -52,8 +52,8 @@ systemd:
         [Unit]
         Description=Kubernetes Kubelet
         Documentation=https://github.com/kubernetes/kubernetes
-        After=docker.service
-        Requires=docker.service
+        Wants=network-online.target
+        After=network-online.target
 
         [Service]
         ExecStart=/opt/bin/kubelet \
