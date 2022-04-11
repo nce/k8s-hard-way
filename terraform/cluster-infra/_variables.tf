@@ -33,7 +33,6 @@ variable "aws_instance_type" {
   default = "t4g.small"
 }
 
-
 variable "aws_vpc_cidr" {
   description = "Cluster VPC cidr block"
   type        = string
