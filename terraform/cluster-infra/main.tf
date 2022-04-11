@@ -108,8 +108,7 @@ module "controlplane" {
     module.securitygroups.controlplane.id
   ]
 
-  aws_instance_type  = var.aws_instance_type
-  aws_ssh_public_key = var.ssh_public_key
+  aws_instance_type = var.aws_instance_type
 
   user_data = module.controlplane_userdata.user_data
 

@@ -9,8 +9,6 @@ resource "aws_instance" "instance" {
   instance_type = var.aws_instance_type
   ami           = data.aws_ami.flatcar.id
 
-  key_name = aws_key_pair.admin.key_name
-
   subnet_id = var.aws_private_subnets[
     keys(data.aws_availability_zone.all)[
       (count.index) % length(keys(data.aws_availability_zone.all))

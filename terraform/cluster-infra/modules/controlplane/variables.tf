@@ -18,10 +18,6 @@ variable "aws_instance_type" {
   type = string
 }
 
-variable "aws_ssh_public_key" {
-  type = string
-}
-
 variable "aws_private_subnets" {
   type = map(string)
 }
