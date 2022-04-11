@@ -9,12 +9,23 @@ module "networking" {
 
   aws_vpc_cidr     = var.aws_vpc_cidr
   k8s_cluster_name = var.k8s_cluster_name
+  dns_root_zone    = var.dns_root_zone
 }
 
 module "securitygroups" {
   source = "./modules/securitygroups"
 
   vpc_id = module.networking.vpc_id
+}
+
+module "publick8sapi" {
+  source = "./modules/publick8sapi"
+
+  k8s_cluster_name = var.k8s_cluster_name
+
+  vpc_id        = module.networking.vpc_id
+  aws_subnets   = module.networking.private_subnets
+  dns_main_zone = module.networking.dns_main_zone
 }
 
 module "pki" {
@@ -87,9 +98,9 @@ module "etcd_dns_discovery" {
 module "controlplane" {
   source = "./modules/controlplane"
 
-  k8s_version          = var.k8s_version
-  k8s_cluster_name     = var.k8s_cluster_name
-  k8s_controller_count = var.k8s_controller_count
+  k8s_version            = var.k8s_version
+  k8s_cluster_name       = var.k8s_cluster_name
+  k8s_controlplane_count = var.k8s_controlplane_count
 
   aws_vpc_id          = module.networking.vpc_id
   aws_private_subnets = module.networking.private_subnets
@@ -109,4 +120,6 @@ module "controlplane" {
 
   etcd_discovery_zone_id = module.etcd_dns_discovery.zone_id
   etcd_discovery_domain  = var.etcd_discovery_domain
+
+  awslb_apiserver_targetgroup_arn = module.publick8sapi.awslb_apiserver_targetgroup_arn
 }

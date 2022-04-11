@@ -9,3 +9,8 @@ output "private_subnets" {
 output "vpc_id" {
   value = aws_vpc.vpc.id
 }
+
+output "dns_main_zone" {
+  value = aws_route53_zone.dns
+}
+

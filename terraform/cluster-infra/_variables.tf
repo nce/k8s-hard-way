@@ -12,7 +12,7 @@ variable "k8s_cluster_name" {
   default = "ugo-k8s"
 }
 
-variable "k8s_controller_count" {
+variable "k8s_controlplane_count" {
   description = "Initial controlplane size"
   type        = number
 
@@ -96,6 +96,15 @@ variable "k8s_cluster_dns" {
 
   default = "10.32.0.53"
 }
+
+variable "dns_root_zone" {
+  description = "Root DNS Zone"
+
+  default = "adorsys-sandbox.aws.adorsys.de."
+}
+
+
+
 #
 #variable "k8s_pod_cidr" {
 #  description = "CIDR of all pods in the cluster"

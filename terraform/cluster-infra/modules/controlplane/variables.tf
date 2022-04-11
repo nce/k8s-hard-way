@@ -6,8 +6,12 @@ variable "k8s_cluster_name" {
   type = string
 }
 
-variable "k8s_controller_count" {
+variable "k8s_controlplane_count" {
   type = number
+}
+
+variable "awslb_apiserver_targetgroup_arn" {
+  type = string
 }
 
 variable "aws_instance_type" {

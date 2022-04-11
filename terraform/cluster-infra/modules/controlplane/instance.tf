@@ -1,5 +1,5 @@
 resource "aws_instance" "instance" {
-  count = var.k8s_controller_count
+  count = var.k8s_controlplane_count
 
   tags = {
     Name                                            = "${var.k8s_cluster_name}-controlplane-${count.index}"
