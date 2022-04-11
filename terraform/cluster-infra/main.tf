@@ -53,6 +53,14 @@ module "clusterfiles" {
   k8s_pki_serviceaccount_key           = module.pki.k8s_serviceaccount_key
   k8s_pki_apiserver_crt                = module.pki.k8s_apiserver_crt
   k8s_pki_apiserver_key                = module.pki.k8s_apiserver_key
+  k8s_pki_scheduler_crt                = module.pki.k8s_scheduler_crt
+  k8s_pki_scheduler_key                = module.pki.k8s_scheduler_key
+  k8s_pki_controller_manager_crt       = module.pki.k8s_controller_manager_crt
+  k8s_pki_controller_manager_key       = module.pki.k8s_controller_manager_key
+  k8s_pki_admin_crt                    = module.pki.k8s_admin_crt
+  k8s_pki_admin_key                    = module.pki.k8s_admin_key
+
+
 }
 
 module "controlplane_userdata" {

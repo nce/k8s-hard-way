@@ -20,6 +20,7 @@ resource "tls_cert_request" "k8s_apiserver" {
   ]
 
   ip_addresses = [
+    "127.0.0.1",
     var.k8s_service_ip
   ]
 }

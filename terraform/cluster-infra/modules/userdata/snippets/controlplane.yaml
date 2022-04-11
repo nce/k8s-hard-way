@@ -52,8 +52,8 @@ systemd:
         [Unit]
         Description=Kubernetes Kubelet
         Documentation=https://github.com/kubernetes/kubernetes
-        After=docker.service
-        Requires=docker.service
+        After=containerd.service
+        Requires=containerd.service
 
         [Service]
         ExecStart=/opt/bin/kubelet \

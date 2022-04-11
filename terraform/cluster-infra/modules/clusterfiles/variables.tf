@@ -90,4 +90,28 @@ variable "k8s_pki_apiserver_crt" {
   type = string
 }
 
+variable "k8s_pki_controller_manager_key" {
+  type = string
+}
+
+variable "k8s_pki_controller_manager_crt" {
+  type = string
+}
+
+variable "k8s_pki_scheduler_key" {
+  type = string
+}
+
+variable "k8s_pki_scheduler_crt" {
+  type = string
+}
+
+variable "k8s_pki_admin_key" {
+  type = string
+}
+
+variable "k8s_pki_admin_crt" {
+  type = string
+}
+
 

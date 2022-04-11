@@ -7,20 +7,19 @@ locals {
         group = "root"
 
         content = templatefile("${path.module}/files/controlplane/${filename}", {
-          k8s_cluster_name = var.k8s_cluster_name
+          k8s_cluster_name   = var.k8s_cluster_name
+          kubernetes_version = var.k8s_version
 
           etcd_version          = var.etcd_version
           etcd_peer_name        = "etcd0"
           etcd_discovery_domain = var.etcd_discovery_domain
 
+          cluster_dns = var.k8s_cluster_dns
+
           # kube-apiserver
           controller_count        = 1
           kubernetes_service_cidr = var.k8s_service_cidr
           k8s_api_extern          = var.k8s_api_extern
-          kubernetes_version      = var.k8s_version
-
-          cluster_dns = var.k8s_cluster_dns
-
         })
       }
     },
@@ -126,12 +125,30 @@ locals {
         user    = "root"
         group   = "root"
         mode    = "0600"
-        content = module.bootstrap_kubeconfig.kubeconfig
+        content = module.kubeconfig_bootstrap.kubeconfig
+      }
+      "/etc/kubernetes/admin.conf" = {
+        user    = "root"
+        group   = "root"
+        mode    = "0600"
+        content = module.kubeconfig_admin.kubeconfig
+      }
+      "/etc/kubernetes/scheduler.conf" = {
+        user    = "root"
+        group   = "root"
+        mode    = "0600"
+        content = module.kubeconfig_scheduler.kubeconfig
+      }
+      "/etc/kubernetes/controller-manager.conf" = {
+        user    = "root"
+        group   = "root"
+        mode    = "0600"
+        content = module.kubeconfig_controller_manager.kubeconfig
       }
   })
 }
 
-module "bootstrap_kubeconfig" {
+module "kubeconfig_bootstrap" {
   source = "../kubeconfig"
 
   k8s_cluster_name = var.k8s_cluster_name
@@ -139,5 +156,38 @@ module "bootstrap_kubeconfig" {
   k8s_username     = "kubelet-bootstrap"
   k8s_pki_ca_crt   = var.k8s_pki_ca_crt
   k8s_token        = "07401b.f395accd246ae52d"
+}
+
+module "kubeconfig_scheduler" {
+  source = "../kubeconfig"
+
+  k8s_cluster_name   = var.k8s_cluster_name
+  k8s_api            = "127.0.0.1"
+  k8s_username       = "default-scheduler"
+  k8s_pki_ca_crt     = var.k8s_pki_ca_crt
+  k8s_pki_client_crt = var.k8s_pki_scheduler_crt
+  k8s_pki_client_key = var.k8s_pki_scheduler_key
+}
+
+module "kubeconfig_controller_manager" {
+  source = "../kubeconfig"
+
+  k8s_cluster_name   = var.k8s_cluster_name
+  k8s_api            = "127.0.0.1"
+  k8s_username       = "default-controller-manager"
+  k8s_pki_ca_crt     = var.k8s_pki_ca_crt
+  k8s_pki_client_crt = var.k8s_pki_controller_manager_crt
+  k8s_pki_client_key = var.k8s_pki_controller_manager_key
+}
+
+module "kubeconfig_admin" {
+  source = "../kubeconfig"
+
+  k8s_cluster_name   = var.k8s_cluster_name
+  k8s_api            = "127.0.0.1"
+  k8s_username       = "default-admin"
+  k8s_pki_ca_crt     = var.k8s_pki_ca_crt
+  k8s_pki_client_crt = var.k8s_pki_admin_crt
+  k8s_pki_client_key = var.k8s_pki_admin_key
 
 }
