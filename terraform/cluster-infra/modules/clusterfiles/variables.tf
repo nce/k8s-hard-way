@@ -47,19 +47,19 @@ variable "etcd_pki_ca_crt" {
 }
 
 variable "etcd_pki_peer_key" {
-  type = string
+  type = list(string)
 }
 
 variable "etcd_pki_peer_crt" {
-  type = string
+  type = list(string)
 }
 
 variable "etcd_pki_server_key" {
-  type = string
+  type = list(string)
 }
 
 variable "etcd_pki_server_crt" {
-  type = string
+  type = list(string)
 }
 
 variable "k8s_pki_apiserver_etcd_client_key" {

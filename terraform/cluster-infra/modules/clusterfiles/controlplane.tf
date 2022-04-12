@@ -88,25 +88,25 @@ locals {
         user    = "etcd"
         group   = "etcd"
         mode    = "0600"
-        content = var.etcd_pki_server_key
+        content = var.etcd_pki_server_key[i]
       }
       "/etc/kubernetes/pki/etcd/server.crt" = {
         user    = "etcd"
         group   = "etcd"
         mode    = "0644"
-        content = var.etcd_pki_server_crt
+        content = var.etcd_pki_server_crt[i]
       }
       "/etc/kubernetes/pki/etcd/peer.key" = {
         user    = "etcd"
         group   = "etcd"
         mode    = "0600"
-        content = var.etcd_pki_peer_key
+        content = var.etcd_pki_peer_key[i]
       }
       "/etc/kubernetes/pki/etcd/peer.crt" = {
         user    = "etcd"
         group   = "etcd"
         mode    = "0644"
-        content = var.etcd_pki_peer_crt
+        content = var.etcd_pki_peer_crt[i]
       }
       "/etc/kubernetes/pki/apiserver-kubelet-client.key" = {
         user    = "root"

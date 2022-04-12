@@ -31,8 +31,10 @@ module "publick8sapi" {
 module "pki" {
   source = "./modules/pki"
 
-  k8s_api_extern = var.k8s_api_extern
-  k8s_service_ip = var.k8s_service_ip
+  k8s_api_extern         = var.k8s_api_extern
+  k8s_service_ip         = var.k8s_service_ip
+  k8s_controlplane_count = var.k8s_controlplane_count
+  etcd_discovery_domain  = var.etcd_discovery_domain
 
 }
 

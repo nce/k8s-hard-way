@@ -71,17 +71,17 @@ output "k8s_admin_crt" {
 }
 
 output "etcd_peer_crt" {
-  value = tls_locally_signed_cert.k8s_etcd_peer.cert_pem
+  value = tls_locally_signed_cert.k8s_etcd_peer[*].cert_pem
 }
 
 output "etcd_peer_key" {
-  value = tls_private_key.k8s_etcd_peer.private_key_pem
+  value = tls_private_key.k8s_etcd_peer[*].private_key_pem
 }
 
 output "etcd_server_crt" {
-  value = tls_locally_signed_cert.k8s_etcd_server.cert_pem
+  value = tls_locally_signed_cert.k8s_etcd_server[*].cert_pem
 }
 
 output "etcd_server_key" {
-  value = tls_private_key.k8s_etcd_server.private_key_pem
+  value = tls_private_key.k8s_etcd_server[*].private_key_pem
 }
