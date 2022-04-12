@@ -1,0 +1,16 @@
+storage:
+  files:
+    - path: "${path}"
+      filesystem: rootfs
+      mode: ${mode}
+      user:
+        name: ${user}
+      group:
+        name: ${group}
+      contents:
+        remote:
+          verification:
+            hash:
+              function: sha512
+              sum: ${hash}
+          url: s3://${bucket}${path}
