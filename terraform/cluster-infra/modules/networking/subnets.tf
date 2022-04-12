@@ -31,6 +31,7 @@ resource "aws_subnet" "public" {
   cidr_block        = cidrsubnet(local.public_cidr, 3, var.az_mapping[each.value.name_suffix])
 
   tags = {
+    Name                                            = "${var.k8s_cluster_name}-public"
     "kubernetes.io/role/elb"                        = "1"
     "kubernetes.io/cluster/${var.k8s_cluster_name}" = "owned"
   }
@@ -44,6 +45,7 @@ resource "aws_subnet" "private" {
   cidr_block        = cidrsubnet(local.private_cidr, 3, var.az_mapping[each.value.name_suffix])
 
   tags = {
+    Name                                            = "${var.k8s_cluster_name}-private"
     "kubernetes.io/role/elb"                        = "1"
     "kubernetes.io/cluster/${var.k8s_cluster_name}" = "owned"
   }
