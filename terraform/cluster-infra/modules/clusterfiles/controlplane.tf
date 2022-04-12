@@ -151,7 +151,7 @@ module "kubeconfig_bootstrap" {
   source = "../kubeconfig"
 
   k8s_cluster_name = var.k8s_cluster_name
-  k8s_api          = "127.0.0.1"
+  k8s_api          = "127.0.0.1:6443"
   k8s_username     = "kubelet-bootstrap"
   k8s_pki_ca_crt   = var.k8s_pki_ca_crt
   k8s_token        = "07401b.f395accd246ae52d"
@@ -161,7 +161,7 @@ module "kubeconfig_scheduler" {
   source = "../kubeconfig"
 
   k8s_cluster_name   = var.k8s_cluster_name
-  k8s_api            = "127.0.0.1"
+  k8s_api            = "127.0.0.1:6443"
   k8s_username       = "default-scheduler"
   k8s_pki_ca_crt     = var.k8s_pki_ca_crt
   k8s_pki_client_crt = var.k8s_pki_scheduler_crt
@@ -172,7 +172,7 @@ module "kubeconfig_controller_manager" {
   source = "../kubeconfig"
 
   k8s_cluster_name   = var.k8s_cluster_name
-  k8s_api            = "127.0.0.1"
+  k8s_api            = "127.0.0.1:6443"
   k8s_username       = "default-controller-manager"
   k8s_pki_ca_crt     = var.k8s_pki_ca_crt
   k8s_pki_client_crt = var.k8s_pki_controller_manager_crt
@@ -183,7 +183,7 @@ module "kubeconfig_admin" {
   source = "../kubeconfig"
 
   k8s_cluster_name   = var.k8s_cluster_name
-  k8s_api            = "127.0.0.1"
+  k8s_api            = var.k8s_api_extern
   k8s_username       = "default-admin"
   k8s_pki_ca_crt     = var.k8s_pki_ca_crt
   k8s_pki_client_crt = var.k8s_pki_admin_crt
