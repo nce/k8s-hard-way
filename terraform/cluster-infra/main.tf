@@ -24,7 +24,7 @@ module "publick8sapi" {
   k8s_cluster_name = var.k8s_cluster_name
 
   vpc_id        = module.networking.vpc_id
-  aws_subnets   = module.networking.private_subnets
+  aws_subnets   = module.networking.public_subnets
   dns_main_zone = module.networking.dns_main_zone
 }
 
@@ -126,4 +126,10 @@ module "controlplane" {
   etcd_discovery_domain  = var.etcd_discovery_domain
 
   awslb_apiserver_targetgroup_arn = module.publick8sapi.awslb_apiserver_targetgroup_arn
+}
+
+resource "local_file" "admin_kubeconfig" {
+  filename        = pathexpand("~/.kube/admin_${var.k8s_cluster_name}")
+  content         = module.clusterfiles.kubeconfig_admin
+  file_permission = "0600"
 }
