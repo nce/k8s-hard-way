@@ -9,3 +9,7 @@ variable "files" {
 variable "snippets" {
   type = list(string)
 }
+
+variable "index" {
+  type = number
+}

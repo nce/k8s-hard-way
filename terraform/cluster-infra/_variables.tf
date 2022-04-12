@@ -16,7 +16,7 @@ variable "k8s_controlplane_count" {
   description = "Initial controlplane size"
   type        = number
 
-  default = 1
+  default = 2
 }
 
 variable "etcd_discovery_domain" {
@@ -31,6 +31,13 @@ variable "aws_instance_type" {
   type        = string
 
   default = "t4g.small"
+}
+
+variable "ssh_public_key" {
+  description = "SSH Public Key used to access all instances"
+  type        = string
+
+  default = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFldffWdqC4BTSXVya3tEc7gihX0L+COYinDQuu6kaG/ ull@m1"
 }
 
 variable "aws_vpc_cidr" {

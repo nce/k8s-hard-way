@@ -39,7 +39,8 @@ module "pki" {
 module "clusterfiles" {
   source = "./modules/clusterfiles"
 
-  k8s_cluster_name = var.k8s_cluster_name
+  k8s_cluster_name       = var.k8s_cluster_name
+  k8s_controlplane_count = var.k8s_controlplane_count
 
   etcd_version          = var.etcd_version
   etcd_discovery_domain = var.etcd_discovery_domain
@@ -71,13 +72,13 @@ module "clusterfiles" {
   k8s_pki_admin_crt                    = module.pki.k8s_admin_crt
   k8s_pki_admin_key                    = module.pki.k8s_admin_key
 
-
 }
 
 module "controlplane_userdata" {
   source = "./modules/userdata"
 
-  k8s_cluster_name = var.k8s_cluster_name
+  k8s_cluster_name       = var.k8s_cluster_name
+  k8s_controlplane_count = var.k8s_controlplane_count
 
   k8s_kubernetes_version = var.k8s_version
   k8s_kubelet_sha512     = var.k8s_kubelet_sha512
@@ -91,8 +92,9 @@ module "controlplane_userdata" {
 module "etcd_dns_discovery" {
   source = "./modules/etcddnsdiscovery"
 
-  vpc_id                = module.networking.vpc_id
-  etcd_discovery_domain = var.etcd_discovery_domain
+  vpc_id                 = module.networking.vpc_id
+  etcd_discovery_domain  = var.etcd_discovery_domain
+  k8s_controlplane_count = var.k8s_controlplane_count
 }
 
 module "controlplane" {
@@ -108,14 +110,15 @@ module "controlplane" {
     module.securitygroups.controlplane.id
   ]
 
-  aws_instance_type = var.aws_instance_type
+  aws_instance_type  = var.aws_instance_type
+  aws_ssh_public_key = var.ssh_public_key
 
   user_data = module.controlplane_userdata.user_data
 
-  aws_iam_role_policy_attachments = [
+  aws_iam_role_policy_attachments = { for i in range(0, var.k8s_controlplane_count) : i => [
     module.systemsmanager.iam_role_policy_arn,
-    module.controlplane_userdata.ignition_s3_policy_arn
-  ]
+    module.controlplane_userdata.ignition_s3_policy_arn[i]
+  ] }
 
   etcd_discovery_zone_id = module.etcd_dns_discovery.zone_id
   etcd_discovery_domain  = var.etcd_discovery_domain

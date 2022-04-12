@@ -18,6 +18,10 @@ variable "aws_instance_type" {
   type = string
 }
 
+variable "aws_ssh_public_key" {
+  type = string
+}
+
 variable "aws_private_subnets" {
   type = map(string)
 }
@@ -31,11 +35,11 @@ variable "aws_security_group_ids" {
 }
 
 variable "aws_iam_role_policy_attachments" {
-  type = list(string)
+  type = map(list(string))
 }
 
 variable "user_data" {
-  type = string
+  type = list(string)
 }
 
 variable "etcd_discovery_zone_id" {

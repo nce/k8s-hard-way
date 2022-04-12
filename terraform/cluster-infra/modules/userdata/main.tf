@@ -19,9 +19,11 @@ locals {
 
 module "ignition" {
   source = "../../modules/ignition"
+  count  = var.k8s_controlplane_count
 
   k8s_cluster_name = var.k8s_cluster_name
-  files            = merge(local.files_rendered, var.files)
+  files            = merge(local.files_rendered, var.files["${count.index}"])
   snippets         = local.snippets
+  index            = count.index
 }
 

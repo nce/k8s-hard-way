@@ -1,27 +1,26 @@
 locals {
-  files_controlplane_configs = merge(
-    {
-      for filename in fileset("${path.module}/files/controlplane/", "**/*") : "/${filename}" => {
-        mode  = "0644"
-        user  = "root"
-        group = "root"
+  files_controlplane_configs = { for i in range(0, var.k8s_controlplane_count) : i => merge({
+    for filename in fileset("${path.module}/files/controlplane/", "**/*") : "/${filename}" => {
+      mode  = "0644"
+      user  = "root"
+      group = "root"
 
-        content = templatefile("${path.module}/files/controlplane/${filename}", {
-          k8s_cluster_name   = var.k8s_cluster_name
-          kubernetes_version = var.k8s_version
+      content = templatefile("${path.module}/files/controlplane/${filename}", {
+        k8s_cluster_name   = var.k8s_cluster_name
+        kubernetes_version = var.k8s_version
 
-          etcd_version          = var.etcd_version
-          etcd_peer_name        = "etcd0"
-          etcd_discovery_domain = var.etcd_discovery_domain
+        etcd_version          = var.etcd_version
+        etcd_peer_name        = "etcd${i}"
+        etcd_discovery_domain = var.etcd_discovery_domain
 
-          cluster_dns = var.k8s_cluster_dns
+        cluster_dns = var.k8s_cluster_dns
 
-          # kube-apiserver
-          controller_count        = 1
-          kubernetes_service_cidr = var.k8s_service_cidr
-          k8s_api_extern          = var.k8s_api_extern
-        })
-      }
+        # kube-apiserver
+        controller_count        = var.k8s_controlplane_count
+        kubernetes_service_cidr = var.k8s_service_cidr
+        k8s_api_extern          = var.k8s_api_extern
+      })
+    }
     },
     # https://kubernetes.io/docs/setup/best-practices/certificates/#certificate-paths
     {
@@ -145,7 +144,7 @@ locals {
         mode    = "0600"
         content = module.kubeconfig_controller_manager.kubeconfig
       }
-  })
+  }) }
 }
 
 module "kubeconfig_bootstrap" {

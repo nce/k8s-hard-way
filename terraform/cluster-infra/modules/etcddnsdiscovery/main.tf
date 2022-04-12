@@ -15,8 +15,8 @@ resource "aws_route53_record" "etcd_discovery_domain" {
   type = "SRV"
   ttl  = "60"
 
-  records = [
-    "0 0 2380 etcd0.${var.etcd_discovery_domain}"
+  records = [for i in range(0, var.k8s_controlplane_count) :
+    "0 0 2380 etcd${i}.${var.etcd_discovery_domain}"
   ]
 
 }

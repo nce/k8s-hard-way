@@ -5,3 +5,7 @@ variable "vpc_id" {
 variable "etcd_discovery_domain" {
   type = string
 }
+
+variable "k8s_controlplane_count" {
+  type = string
+}

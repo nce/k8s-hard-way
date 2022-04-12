@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "ignition" {
-  bucket = "${var.k8s_cluster_name}-ignition-configs"
+  bucket = "${var.k8s_cluster_name}-ignition-controlplane-${var.index}"
 }
 
 resource "aws_s3_bucket_acl" "ignition" {
@@ -31,7 +31,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "ignition" {
 }
 
 resource "aws_iam_policy" "ignition_s3" {
-  name   = "${var.k8s_cluster_name}-s3"
+  name   = "${var.k8s_cluster_name}-controlplane-s3-${var.index}"
   path   = "/${var.k8s_cluster_name}/"
   policy = data.aws_iam_policy_document.ignition.json
 }
