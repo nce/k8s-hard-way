@@ -16,7 +16,7 @@ variable "k8s_controlplane_count" {
   description = "Initial controlplane size"
   type        = number
 
-  default = 2
+  default = 3
 }
 
 variable "etcd_discovery_domain" {
