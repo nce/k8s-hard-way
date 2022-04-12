@@ -31,4 +31,39 @@ resource "aws_security_group_rule" "world_to_controlplane" {
   security_group_id = aws_security_group.controlplane.id
 }
 
+resource "aws_security_group_rule" "dns_in_controlplane" {
+  for_each          = toset(["TCP", "UDP"])
+  security_group_id = aws_security_group.controlplane.id
+  description       = "DNS in Controlplane"
 
+  from_port = 53
+  to_port   = 53
+  protocol  = each.key
+  type      = "ingress"
+
+  self = true
+}
+
+resource "aws_security_group_rule" "etcd_in_controlplane" {
+  description = "ETCD in controlplane"
+
+  from_port = 2379
+  to_port   = 2380
+  protocol  = "TCP"
+  type      = "ingress"
+
+  self              = true
+  security_group_id = aws_security_group.controlplane.id
+}
+
+resource "aws_security_group_rule" "kubelet_in_controlplane" {
+  description = "Kubelet in controlplane"
+
+  from_port = 10250
+  to_port   = 10250
+  protocol  = "TCP"
+  type      = "ingress"
+
+  self              = true
+  security_group_id = aws_security_group.controlplane.id
+}
