@@ -3,6 +3,10 @@ passwd:
   users:
     - name: core
 storage:
+  links:
+    - path: /etc/localtime
+      target: ../usr/share/zoneinfo/Europe/Berlin
+      hard: false
   files:
     - path: /opt/bin/kubectl
       filesystem: root
