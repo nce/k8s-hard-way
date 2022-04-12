@@ -70,6 +70,8 @@ https://github.com/kubernetes/kubeadm/blob/main/docs/design/design_v1.10.md
   - [ ] https://kubernetes.io/blog/2021/04/21/graceful-node-shutdown-beta/
   - [ ] aws ssm instead of ssh
   - [ ] logging: cloudwatch
+  - [ ] check encryption: etcd; ebs; s3
+  - [ ] kubecost
 
 # Implementation
 ## Hosts
@@ -97,8 +99,17 @@ installing kubectl login plugin...
 - [ ] restore fine grained security groups
 
 # Usage
-## Get admin kubeconfig
-Copy the kubeconfig from remote to local station:
-`scp -J ec2-user@$(terraform output -raw bastion_ip_public) ec2-user@$(terraform output -raw first_controller_ip):admin.kubeconfig .`
 
-
+# References
+## Gerneral Reference
+* https://github.com/kubernetes/kubeadm/blob/main/docs/design/design_v1.10.md
+* https://kubernetes.io/docs/concepts/architecture/control-plane-node-communication/
+## Kubernetes TLS
+* https://kubernetes.io/docs/setup/best-practices/certificates/
+## Kubernetes Bootstrapping
+* https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/
+## Etcd Autodiscovery
+* https://etcd.io/docs/v3.5/op-guide/clustering/#dns-discovery
+## Userdata/Ignition
+* https://github.com/coreos/container-linux-config-transpiler/blob/master/doc/configuration.md
+* https://www.flatcar.org/docs/latest/provisioning/ignition/specification/
