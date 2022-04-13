@@ -11,3 +11,17 @@ variable "k8s_api_extern" {
 
   default = "api.ugo-k8s.adorsys-sandbox.aws.adorsys.de"
 }
+
+variable "aws_vpc_cni_k8s" {
+  description = "Helm Chart Version"
+  type        = string
+
+  default = "1.1.12"
+}
+
+variable "kubelet_csr_approver_version" {
+  description = "Helm Chart Version"
+  type        = string
+
+  default = "0.2.2"
+}
