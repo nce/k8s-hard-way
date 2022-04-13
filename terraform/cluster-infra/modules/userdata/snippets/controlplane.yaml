@@ -1,4 +1,8 @@
 ---
+update:
+  group:  "alpha"
+  server: "https://public.update.flatcar-linux.net/v1/update/"
+
 passwd:
   users:
     - name: core
