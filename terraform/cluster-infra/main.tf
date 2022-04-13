@@ -87,7 +87,10 @@ module "clusterfiles" {
   k8s_pki_controller_manager_key       = module.pki.k8s_controller_manager_key
   k8s_pki_admin_crt                    = module.pki.k8s_admin_crt
   k8s_pki_admin_key                    = module.pki.k8s_admin_key
-
+  k8s_pki_front_proxy_ca_crt           = module.pki.k8s_front_proxy_ca_crt
+  k8s_pki_front_proxy_ca_key           = module.pki.k8s_front_proxy_ca_key
+  k8s_pki_front_proxy_crt              = module.pki.k8s_front_proxy_crt
+  k8s_pki_front_proxy_key              = module.pki.k8s_front_proxy_key
 }
 
 module "controlplane_userdata" {

@@ -14,6 +14,14 @@ output "etcd_ca_crt" {
   value = tls_self_signed_cert.etcd_ca.cert_pem
 }
 
+output "k8s_front_proxy_ca_key" {
+  value = tls_private_key.k8s_front_proxy_ca.private_key_pem
+}
+
+output "k8s_front_proxy_ca_crt" {
+  value = tls_self_signed_cert.k8s_front_proxy_ca.cert_pem
+}
+
 output "k8s_apiserver_etcd_client_key" {
   value = tls_private_key.k8s_apiserver_etcd_client.private_key_pem
 }
@@ -84,4 +92,12 @@ output "etcd_server_crt" {
 
 output "etcd_server_key" {
   value = tls_private_key.k8s_etcd_server[*].private_key_pem
+}
+
+output "k8s_front_proxy_key" {
+  value = tls_private_key.k8s_front_proxy.private_key_pem
+}
+
+output "k8s_front_proxy_crt" {
+  value = tls_locally_signed_cert.k8s_front_proxy.cert_pem
 }

@@ -38,6 +38,14 @@ variable "k8s_pki_ca_key" {
   type = string
 }
 
+variable "k8s_pki_front_proxy_ca_crt" {
+  type = string
+}
+
+variable "k8s_pki_front_proxy_ca_key" {
+  type = string
+}
+
 variable "etcd_pki_ca_key" {
   type = string
 }
@@ -119,5 +127,13 @@ variable "k8s_pki_admin_crt" {
 }
 
 variable "k8s_kubelet_bootstrap_token" {
+  type = string
+}
+
+variable "k8s_pki_front_proxy_crt" {
+  type = string
+}
+
+variable "k8s_pki_front_proxy_key" {
   type = string
 }

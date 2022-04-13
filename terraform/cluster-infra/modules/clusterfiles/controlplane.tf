@@ -120,6 +120,30 @@ locals {
         mode    = "0644"
         content = var.k8s_pki_apiserver_kubelet_client_crt
       }
+      "/etc/kubernetes/pki/front-proxy-ca.crt" = {
+        user    = "root"
+        group   = "root"
+        mode    = "0644"
+        content = var.k8s_pki_front_proxy_ca_crt
+      }
+      "/etc/kubernetes/pki/front-proxy-ca.key" = {
+        user    = "root"
+        group   = "root"
+        mode    = "0600"
+        content = var.k8s_pki_front_proxy_ca_key
+      }
+      "/etc/kubernetes/pki/front-proxy-client.crt" = {
+        user    = "root"
+        group   = "root"
+        mode    = "0644"
+        content = var.k8s_pki_front_proxy_crt
+      }
+      "/etc/kubernetes/pki/front-proxy-client.key" = {
+        user    = "root"
+        group   = "root"
+        mode    = "0600"
+        content = var.k8s_pki_front_proxy_key
+      }
       "/var/lib/kubelet/bootstrap-kubeconfig" = {
         user    = "root"
         group   = "root"

@@ -8,7 +8,7 @@ resource "tls_self_signed_cert" "k8s_ca" {
   private_key_pem = tls_private_key.k8s_ca.private_key_pem
 
   subject {
-    common_name  = "kubernetes"
+    common_name  = "kubernetes-ca"
     organization = "nce ACME"
   }
 

@@ -8,7 +8,7 @@ resource "tls_self_signed_cert" "etcd_ca" {
   private_key_pem = tls_private_key.etcd_ca.private_key_pem
 
   subject {
-    common_name  = "etcd"
+    common_name  = "etcd-ca"
     organization = "nce ACME"
   }
 
