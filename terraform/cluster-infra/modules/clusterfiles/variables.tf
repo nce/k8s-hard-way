@@ -118,4 +118,6 @@ variable "k8s_pki_admin_crt" {
   type = string
 }
 
-
+variable "k8s_kubelet_bootstrap_token" {
+  type = string
+}

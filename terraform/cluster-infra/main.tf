@@ -38,18 +38,32 @@ module "pki" {
 
 }
 
+# https://kubernetes.io/docs/reference/access-authn-authz/bootstrap-tokens/#token-format
+resource "random_string" "kubelet_bootstrap_token_id" {
+  length  = 6
+  special = false
+  upper   = false
+}
+resource "random_password" "kubelet_bootstrap_token" {
+  length  = 16
+  special = false
+  upper   = false
+}
+
 module "clusterfiles" {
   source = "./modules/clusterfiles"
 
   k8s_cluster_name       = var.k8s_cluster_name
   k8s_controlplane_count = var.k8s_controlplane_count
 
-  etcd_version          = var.etcd_version
-  etcd_discovery_domain = var.etcd_discovery_domain
-  k8s_version           = var.k8s_version
-  k8s_cluster_dns       = var.k8s_cluster_dns
-  k8s_api_extern        = var.k8s_api_extern
-  k8s_service_cidr      = var.k8s_service_cidr
+  etcd_version                = var.etcd_version
+  etcd_discovery_domain       = var.etcd_discovery_domain
+  k8s_version                 = var.k8s_version
+  k8s_cluster_dns             = var.k8s_cluster_dns
+  k8s_api_extern              = var.k8s_api_extern
+  k8s_service_cidr            = var.k8s_service_cidr
+  k8s_kubelet_bootstrap_token = "${random_string.kubelet_bootstrap_token_id.id}.${random_password.kubelet_bootstrap_token.id}"
+
 
   k8s_pki_ca_crt                       = module.pki.ca_crt
   k8s_pki_ca_key                       = module.pki.ca_key
@@ -132,4 +146,24 @@ resource "local_file" "admin_kubeconfig" {
   filename        = pathexpand("~/.kube/admin_${var.k8s_cluster_name}")
   content         = module.clusterfiles.kubeconfig_admin
   file_permission = "0600"
+}
+
+resource "aws_ssm_parameter" "secrets" {
+  for_each = {
+    k8s_kubelet_bootstrap_token = random_password.kubelet_bootstrap_token.result
+  }
+
+  name  = "/${var.k8s_cluster_name}/secret/${each.key}"
+  type  = "SecureString"
+  value = each.value
+}
+
+resource "aws_ssm_parameter" "configs" {
+  for_each = {
+    k8s_kubelet_bootstrap_token_id = random_string.kubelet_bootstrap_token_id.id
+  }
+
+  name  = "/${var.k8s_cluster_name}/config/${each.key}"
+  type  = "String"
+  value = each.value
 }

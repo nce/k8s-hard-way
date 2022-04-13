@@ -154,7 +154,7 @@ module "kubeconfig_bootstrap" {
   k8s_api          = "127.0.0.1:6443"
   k8s_username     = "kubelet-bootstrap"
   k8s_pki_ca_crt   = var.k8s_pki_ca_crt
-  k8s_token        = "07401b.f395accd246ae52d"
+  k8s_token        = var.k8s_kubelet_bootstrap_token
 }
 
 module "kubeconfig_scheduler" {

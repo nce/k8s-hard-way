@@ -76,7 +76,7 @@ systemd:
 
         [Install]
         WantedBy=multi-user.target
-    - name: k8s-master-labeler
+    - name: k8s-master-labeler.service
       enabled: true
       contents: |
         [Unit]
