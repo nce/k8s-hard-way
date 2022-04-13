@@ -6,6 +6,22 @@ module "bootstrap" {
 
 }
 
+# we need a proxy to route our service_ip; without that
+# the vpc cni is not reaching the api server via default ENV Var
+# KUBERNETES_SERVICE
+module "kube_proxy" {
+  source = "./modules/kube-proxy"
+
+  k8s_api_extern = var.k8s_api_extern
+  k8s_version    = var.k8s_version
+}
+
+# does not need a vpc if we run in host network
+# which might be a better solution anyway, as its a core component
+#module "aws_cloud_controller_manager" {
+#  source = "./modules/aws-cloud-controller-manager"
+#}
+
 module "aws-vpc-cni-k8s" {
   source = "./modules/aws-vpc-cni-k8s"
 
@@ -23,7 +39,3 @@ module "iam-roles-for-serviceaccounts" {
 
   k8s_api_extern = var.k8s_api_extern
 }
-
-#module "aws_cloud_controller_manager" {
-#  source = "./modules/aws-cloud-controller-manager"
-#}

@@ -1,3 +1,10 @@
+variable "k8s_version" {
+  description = "Version of kubernetes"
+  type        = string
+
+  default = "1.23.5"
+}
+
 variable "k8s_cluster_name" {
   description = "Mnemonic Name of the kubernetes Kluster"
   type        = string

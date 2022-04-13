@@ -137,7 +137,8 @@ module "controlplane" {
   aws_iam_role_policy_attachments = { for i in range(0, var.k8s_controlplane_count) : i => [
     module.systemsmanager.iam_role_policy_arn,
     module.controlplane_userdata.ignition_s3_policy_arn[i],
-    data.aws_iam_policy.AmazonEC2ContainerRegistryReadOnly.arn
+    data.aws_iam_policy.AmazonEC2ContainerRegistryReadOnly.arn,
+    data.aws_iam_policy.AmazonEKS_CNI_Policy.arn
   ] }
 
   etcd_discovery_zone_id = module.etcd_dns_discovery.zone_id
