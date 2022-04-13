@@ -76,3 +76,24 @@ systemd:
 
         [Install]
         WantedBy=multi-user.target
+    - name: k8s-master-labeler
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Nodelabeler
+        Wants=network-online.target
+        After=network-online.target kubelet.service
+
+        [Service]
+        Type=oneshot
+        ExecStart=/opt/bin/kubectl --kubeconfig /etc/kubernetes/admin.conf label nodes/%l node-role.kubernetes.io/master= --overwrite
+        ExecStart=/opt/bin/kubectl --kubeconfig /etc/kubernetes/admin.conf label nodes/%l node-role.kubernetes.io/control-plane= --overwrite
+        ExecStop=/opt/bin/kubectl --kubeconfig /etc/kubernetes/admin.conf label nodes/%l node-role.kubernetes.io/master- --overwrite
+        ExecStop=/opt/bin/kubectl --kubeconfig /etc/kubernetes/admin.conf label nodes/%l node-role.kubernetes.io/control-plane- --overwrite
+        RemainAfterExit=yes
+        Restart=on-failure
+        StartLimitInterval=0
+        RestartSec=5
+
+        [Install]
+        WantedBy=multi-user.target
