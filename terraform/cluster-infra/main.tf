@@ -62,7 +62,7 @@ module "clusterfiles" {
   k8s_cluster_dns             = var.k8s_cluster_dns
   k8s_api_extern              = var.k8s_api_extern
   k8s_service_cidr            = var.k8s_service_cidr
-  k8s_kubelet_bootstrap_token = "${random_string.kubelet_bootstrap_token_id.id}.${random_password.kubelet_bootstrap_token.id}"
+  k8s_kubelet_bootstrap_token = "${random_string.kubelet_bootstrap_token_id.id}.${random_password.kubelet_bootstrap_token.result}"
 
 
   k8s_pki_ca_crt                       = module.pki.ca_crt
