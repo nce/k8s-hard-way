@@ -6,7 +6,14 @@ module "bootstrap" {
 
 }
 
-# we need a proxy to route our service_ip; without that
+# setup module for irsa
+module "iam-roles-for-serviceaccounts" {
+  source = "./modules/iam-roles-for-serviceaccounts"
+
+  k8s_api_extern = var.k8s_api_extern
+}
+
+# we need a proxy to route to our service_ip; without that
 # the vpc cni is not reaching the api server via default ENV Var
 # KUBERNETES_SERVICE
 module "kube_proxy" {
@@ -28,14 +35,12 @@ module "aws-vpc-cni-k8s" {
   chart_version = var.aws_vpc_cni_k8s
 }
 
-#module "kubelet-csr-approver" {
-#  source = "./modules/kubelet-csr-approver"
-#
-#  chart_version = var.kubelet_csr_approver_version
-#}
+# with the csr approver the apiserver can access the kubelet
+# after this we have 'ready' nodes
+module "kubelet-csr-approver" {
+  source = "./modules/kubelet-csr-approver"
 
-module "iam-roles-for-serviceaccounts" {
-  source = "./modules/iam-roles-for-serviceaccounts"
-
-  k8s_api_extern = var.k8s_api_extern
+  chart_version = var.kubelet_csr_approver_version
 }
+
+

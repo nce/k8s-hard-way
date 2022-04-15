@@ -11,11 +11,6 @@ resource "helm_release" "kubelet_csr_approver" {
 
   values = [<<YAML
 providerRegex: "^ip-[a-z0-9-_]*(\\.eu-central-1\\.compute\\.internal)?$"
-#tolerations:
-# - key: node.kubernetes.io/not-ready
-#   effect: NoSchedule
-# - key: node-role.kubernetes.io/master
-#   effect: NoSchedule
 YAML
   ]
 }
