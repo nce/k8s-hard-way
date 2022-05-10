@@ -1,6 +1,11 @@
+variable "aws_profile" {
+  type    = string
+  default = ""
+}
+
 provider "aws" {
   region  = "eu-central-1"
-  profile = "adorsys-sandbox"
+  profile = var.aws_profile
 
   default_tags {
     tags = {
