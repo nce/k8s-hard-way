@@ -25,9 +25,13 @@ module "kube_proxy" {
 
 # does not need a vpc if we run in host network
 # which might be a better solution anyway, as its a core component
-#module "aws_cloud_controller_manager" {
-#  source = "./modules/aws-cloud-controller-manager"
-#}
+module "aws_cloud_controller_manager" {
+  source = "./modules/aws-cloud-controller-manager"
+
+  chart_version    = var.aws_cloud_controller_manager_version
+  k8s_cluster_name = var.k8s_cluster_name
+  k8s_api_extern   = var.k8s_api_extern
+}
 
 module "aws-vpc-cni-k8s" {
   source = "./modules/aws-vpc-cni-k8s"

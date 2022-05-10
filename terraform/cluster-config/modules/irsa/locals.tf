@@ -2,11 +2,11 @@ locals {
 
   env = <<YAML
 - name: AWS_DEFAULT_REGION
-  value: data.aws_region.current.name
+  value: ${data.aws_region.current.name}
 - name: AWS_REGION
-  value: data.aws_region.current.name
+  value: ${data.aws_region.current.name}
 - name: AWS_ROLE_ARN
-  value: aws_iam_role.this.arn
+  value: ${aws_iam_role.this.arn}
 - name: AWS_WEB_IDENTITY_TOKEN_FILE
   value: /var/run/secrets/eks.amazonaws.com/serviceaccount/token
 - name: AWS_STS_REGIONAL_ENDPOINTS

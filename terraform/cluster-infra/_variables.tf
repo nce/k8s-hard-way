@@ -16,7 +16,7 @@ variable "k8s_controlplane_count" {
   description = "Initial controlplane size"
   type        = number
 
-  default = 3
+  default = 2
 }
 
 variable "etcd_discovery_domain" {
@@ -103,7 +103,12 @@ variable "dns_root_zone" {
   default = "adorsys-sandbox.aws.adorsys.de."
 }
 
+variable "github_thumbprint" {
+  description = "List of server certificates for oidc"
 
+  # https://gist.github.com/guitarrapc/8e6b68f21bc1eef8e7b66bde477d5859
+  default = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
+}
 
 #
 #variable "k8s_pod_cidr" {

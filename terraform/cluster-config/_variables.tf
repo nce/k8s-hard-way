@@ -32,3 +32,10 @@ variable "kubelet_csr_approver_version" {
 
   default = "0.2.2"
 }
+
+variable "aws_cloud_controller_manager_version" {
+  description = "Helm Chart Version"
+  type        = string
+
+  default = "0.0.6"
+}

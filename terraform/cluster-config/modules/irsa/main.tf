@@ -7,7 +7,7 @@ resource "aws_iam_role" "this" {
     {
       "Effect": "Allow",
       "Principal": {
-        "Federated": "arn:aws:iam::${data.aws_caller_identity.current}:oidc-provider/${var.issuer}"
+        "Federated": "arn:aws:iam::${data.aws_caller_identity.current.id}:oidc-provider/${var.issuer}"
       },
       "Action": "sts:AssumeRoleWithWebIdentity",
       "Condition": {

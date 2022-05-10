@@ -1,3 +1,9 @@
+module "githubactions" {
+  source = "./modules/githubactions"
+
+  thumbprint = var.github_thumbprint
+}
+
 module "systemsmanager" {
   source = "./modules/systemsmanager"
 

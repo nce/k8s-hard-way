@@ -97,3 +97,23 @@ systemd:
 
         [Install]
         WantedBy=multi-user.target
+
+    - name: "fix-hostname.service"
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Fix Hostname
+        Before=network-pre.target
+        Wants=network-pre.target
+
+        DefaultDependencies=no
+        Requires=local-fs.target
+        After=local-fs.target
+
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/bin/rm -f /etc/hostname
+        RemainAfterExit=yes
+
+        [Install]
+        WantedBy=network.target

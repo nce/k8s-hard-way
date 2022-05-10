@@ -1,9 +1,10 @@
-module "irsa" {
+module "irsa_aws_cloud_controller_manager" {
   source = "../irsa"
 
   policy = data.aws_iam_policy_document.aws_cloud_controller.json
   sub    = "system:serviceaccount:kube-system:aws-cloud-controller-manager"
   issuer = var.k8s_api_extern
+  name   = "aws_cloud_controller"
 }
 
 data "aws_iam_policy_document" "aws_cloud_controller" {

@@ -72,6 +72,9 @@ https://github.com/kubernetes/kubeadm/blob/main/docs/design/design_v1.10.md
   - [ ] logging: cloudwatch
   - [ ] check encryption: etcd; ebs; s3
   - [ ] kubecost
+  - [ ] taints via systemd setzen
+  - [ ] cilium
+  - [ ] replace sealed secrets with kms
 
 # Implementation
 ## Hosts
