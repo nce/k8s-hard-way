@@ -1,0 +1,10 @@
+version: 2
+updates:
+  - package-ecosystem: "Terraform"
+    directory: "/terraform/cluster-config"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "Terraform"
+    directory: "/terraform/cluster-infra"
+    schedule:
+      interval: "daily"
