@@ -29,7 +29,7 @@ jobs:
           role-to-assume: arn:aws:iam::571075516563:role/ugo-github-actions
 
       - name: Terraform init
-        run: terraform init
+        run: terraform init -backend-config=profile=""
         working-directory: ${{ env.working-directory }}
 
       - name: Terraform plan
