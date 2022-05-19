@@ -1,4 +1,14 @@
 terraform {
+
+  backend "s3" {
+    bucket  = "adorsys-sandbox-terraform-state-files"
+    region  = "eu-central-1"
+    profile = "adorsys-sandbox"
+    key     = "ugo/k8s-hard-way/cluster-infra/terraform.state"
+
+    encrypt = true
+  }
+
   required_version = ">= 0.15"
 
   required_providers {
