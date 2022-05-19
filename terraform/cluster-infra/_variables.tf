@@ -103,6 +103,12 @@ variable "dns_root_zone" {
   default = "adorsys-sandbox.aws.adorsys.de."
 }
 
+# https://gist.github.com/guitarrapc/8e6b68f21bc1eef8e7b66bde477d5859?permalink_comment_id=4027755
+variable "github_thumbprint" {
+  description = "Githubusercontent Cert Thumbprint"
+
+  default = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
+}
 
 
 #
