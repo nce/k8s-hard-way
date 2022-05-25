@@ -15,7 +15,7 @@ Furthermore there are certain in-cluster security issues:
 ---
 
 This is an aws based k8s-the-hard-way setup (inspired by [Kelsey Hightower](https://github.com/kelseyhightower/kubernetes-the-hard-way)), solely deployed with terraform ~~and hacky shell
-scripts, triggered by cloud-init~~.
+scripts, triggered by cloud-init~~. No kops or kubeadm.
 
 While initially deployed on Rhel8 with SELinux, it's now based on flatcar and
 going through a major terraform refactoring.
@@ -76,6 +76,7 @@ going through a major terraform refactoring.
   - [ ] check encryption: etcd; ebs; s3
   - [ ] kubecost
   - [ ] Update to 1.24
+  - [ ] Terraform state to s3 bucket
 
 # Implementation
 ## Hosts

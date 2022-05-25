@@ -1,7 +1,8 @@
 module "githubactions" {
   source = "./modules/githubactions"
 
-  thumbprint = var.github_thumbprint
+  thumbprint       = var.github_thumbprint
+  k8s_cluster_name = var.k8s_cluster_name
 }
 
 module "systemsmanager" {

@@ -51,7 +51,7 @@ jobs:
       # Multi-project/workspaces: https://www.infracost.io/docs/features/config_file
       # Combine Infracost JSON files: https://www.infracost.io/docs/features/cli_commands/#combined-output-formats
       - name: Generate Infracost JSON
-        run: infracost breakdown --path plan.json --format json --out-file /tmp/infracost.json
+        run: infracost diff --path plan.json --format json --out-file /tmp/infracost.json
         working-directory: ${{ env.working-directory }}
         # Env vars can be set using the usual GitHub Actions syntax
         # See the list of supported Infracost env vars here: https://www.infracost.io/docs/integrations/environment_variables/
