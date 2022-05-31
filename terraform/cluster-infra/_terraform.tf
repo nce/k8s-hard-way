@@ -28,5 +28,9 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.1"
     }
+    echo = {
+      source  = "jkroepke/echo"
+      version = "~> 0.1.0"
+    }
   }
 }
