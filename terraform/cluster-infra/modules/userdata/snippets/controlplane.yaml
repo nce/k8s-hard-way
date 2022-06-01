@@ -69,7 +69,8 @@ systemd:
           --bootstrap-kubeconfig=/var/lib/kubelet/bootstrap-kubeconfig \
           --kubeconfig=/var/lib/kubelet/kubelet.kubeconfig \
           --container-runtime=remote \
-          --container-runtime-endpoint=unix:///run/containerd/containerd.sock
+          --container-runtime-endpoint=unix:///run/containerd/containerd.sock \
+          --cloud-provider=external
         Restart=always
         RestartSec=10
         RestartLimitInterval=0
