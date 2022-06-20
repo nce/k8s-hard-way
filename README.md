@@ -15,25 +15,23 @@ Furthermore there are certain in-cluster security issues:
 ---
 
 This is an aws based k8s-the-hard-way setup (inspired by [Kelsey Hightower](https://github.com/kelseyhightower/kubernetes-the-hard-way)), solely deployed with terraform ~~and hacky shell
-scripts, triggered by cloud-init~~. No kops or kubeadm.
+scripts, triggered by cloud-init~~. No kops, kubeadm or eks.
 
 While initially deployed on Rhel8 with SELinux, it's now based on flatcar and
 going through a major terraform refactoring.
 
 # Roadmap
 - Clustersetup
-  - [x] CoreDNS
-  - [x] CNI Networking with ~~weave~~ calico
-  - [x] Static pods
+  - [x] Static pods instead of hightower's `systemd` services
+  - [x] Switch from rhel8 to flatcar ~~/talon/bottlerocket~~
   - [x] Move away from shell-scripts to ignition  
     https://github.com/coreos/container-linux-config-transpiler/blob/master/doc/configuration.md
-  - [x] Switch from rhel8 to flatcar ~~/talon/bottlerocket~~
-  - [x] binary checksum verification
+  - [x] Binary checksum verification
   - [x] K8s [bootstrap tokens](https://kubernetes.io/docs/reference/access-authn-authz/bootstrap-tokens/)  
     Kubelets are provisioned on the fly with bootstrap tokens and [the csr-approver](https://github.com/postfinance/kubelet-csr-approver)
   - [ ] `kube-bench` with a reasonable score
   - [x] Move the bastion LB for the k8s api to `aws_lb`  
-    The Bastion Host has a nginx loadbalancing the k8s-api; This should be
+    The Bastion Host has a nginx for loadbalancing the k8s-api; This should be
     replaced by an aws network lb
   - [x] etcd autodiscovery (etcd in autoscalingroups)  
     Right now dns is used for autodiscovery; but the etcd are not part of a
@@ -42,19 +40,24 @@ going through a major terraform refactoring.
     SSH access is not possible as the instances are configured to use the aws
     systemsmanager
 - Clusteraddons
-  - [x] [aws cloud controller manager](https://github.com/kubernetes/cloud-provider-aws) (as external cloud provider in k8s)
-  - [x] [aws-lb-controller](https://github.com/kubernetes-sigs/aws-load-balancer-controller) as ingress class  
+  - [ ] CNI with ~~weave~~ ~~calico~~ [aws-vpc](https://github.com/aws/amazon-vpc-cni-k8s)
+  - [ ] CoreDNS
+  - [ ] [kubelet-csr-approver](https://github.com/postfinance/kubelet-csr-approver)  
+    Automatic kubelet serving approval with [csr](https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-certs/#kubelet-serving-certs)
+  - [ ] [aws-cloud-controller-manager](https://github.com/kubernetes/cloud-provider-aws) (as external cloud provider in k8s)
+  - [ ] [aws-lb-controller](https://github.com/kubernetes-sigs/aws-load-balancer-controller) as ingress class  
     Using IRSA for aws management access
-  - [x] [external_dns](https://github.com/kubernetes-sigs/external-dns) with route53 access  
+  - [ ] [external_dns](https://github.com/kubernetes-sigs/external-dns) with route53 access  
     Using IRSA for aws management access
-  - [x] [sealed-secrets](https://github.com/bitnami-labs/sealed-secrets) as secretstorage  
+  - [ ] [sealed-secrets](https://github.com/bitnami-labs/sealed-secrets) as secretstorage  
     With external private Key (from aws ssm parameter store) for global secrets
     like Github tokens, which should surive clusterrebuilds
-  - [x] [aws-eks-pod-identity-webhook](https://github.com/aws/amazon-eks-pod-identity-webhook) for IRSA  
+  - [ ] [aws-eks-pod-identity-webhook](https://github.com/aws/amazon-eks-pod-identity-webhook) for IRSA  
     Mutating webhook to allow SAs using aws IAM
+  - [ ] aws node termination handler
 - IdentityManagement
-  - [] Dex as idP with Github Backend for all login related Toosl (`kubectl`, argoCD)
-  - [x] Implement [IRSA](https://aws.amazon.com/blogs/opensource/introducing-fine-grained-iam-roles-service-accounts/) for aws acces
+  - [ ] Dex as idP with Github Backend for all login related Toosl (`kubectl`, argoCD)
+  - [x] Implement [IRSA](https://aws.amazon.com/blogs/opensource/introducing-fine-grained-iam-roles-service-accounts/) for aws access
 - Autoscaling
   - [ ] ...
   - [ ] scaling of nodes dependend on load -> karpenter
@@ -74,8 +77,8 @@ going through a major terraform refactoring.
   - [ ] https://kubernetes.io/blog/2021/04/21/graceful-node-shutdown-beta/
   - [ ] logging: cloudwatch
   - [ ] check encryption: etcd; ebs; s3
-  - [ ] kubecost
   - [ ] Update to 1.24
+  - [ ] K8s 1.24: Sigstore
   - [ ] Terraform state to s3 bucket
 
 # Implementation
@@ -92,12 +95,11 @@ The controller & worker nodes are evenly distributed among all availabe AZs:
 - Service CIDR: `10.32.0.0/24`
 - Cluster CIDR: `10.200.0.0/16`
 - Cluster DNS: `10.32.0.53`
+
 ### dex
 intro in dex...
 installing kubectl login plugin...
 
-## open ToDos
-- [ ] view only clusterrolebinding
 
 # Usage
 
@@ -105,12 +107,16 @@ installing kubectl login plugin...
 ## Gerneral Reference
 * https://github.com/kubernetes/kubeadm/blob/main/docs/design/design_v1.10.md
 * https://kubernetes.io/docs/concepts/architecture/control-plane-node-communication/
+* https://aws.github.io/aws-eks-best-practices/
 ## Kubernetes TLS
 * https://kubernetes.io/docs/setup/best-practices/certificates/
-## Kubernetes Bootstrapping
+## Kubelet Bootstrapping
 * https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/
+* https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-certs/#kubelet-serving-certs
 ## Etcd Autodiscovery
 * https://etcd.io/docs/v3.5/op-guide/clustering/#dns-discovery
 ## Userdata/Ignition
 * https://github.com/coreos/container-linux-config-transpiler/blob/master/doc/configuration.md
 * https://www.flatcar.org/docs/latest/provisioning/ignition/specification/
+## Networking
+* https://github.com/aws/amazon-vpc-cni-k8s/blob/master/docs/cni-proposal.md
