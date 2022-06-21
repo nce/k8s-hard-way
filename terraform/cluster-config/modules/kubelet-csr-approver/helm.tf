@@ -7,10 +7,10 @@ resource "helm_release" "kubelet_csr_approver" {
 
   atomic  = true
   lint    = true
-  timeout = 45
+  timeout = 70
 
   values = [<<YAML
-providerRegex: "^ip-[a-z0-9-_]*(\\.eu-central-1\\.compute\\.internal)?$"
+providerRegex: "^i-[a-z0-9-_]*(\\.eu-central-1\\.compute\\.internal)?$"
 YAML
   ]
 }
