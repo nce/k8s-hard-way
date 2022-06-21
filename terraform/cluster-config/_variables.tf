@@ -23,7 +23,7 @@ variable "aws_vpc_cni_k8s" {
   description = "Helm Chart Version"
   type        = string
 
-  default = "1.1.12"
+  default = "1.1.14"
 }
 
 variable "kubelet_csr_approver_version" {
@@ -31,4 +31,11 @@ variable "kubelet_csr_approver_version" {
   type        = string
 
   default = "0.2.2"
+}
+
+variable "aws_cloud_controller_manager_version" {
+  description = "Helm Chart Version"
+  type        = string
+
+  default = "0.0.6"
 }
