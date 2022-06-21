@@ -13,7 +13,9 @@ locals {
         etcd_peer_name        = "etcd${i}"
         etcd_discovery_domain = var.etcd_discovery_domain
 
+        # kubelet-configuration
         cluster_dns = var.k8s_cluster_dns
+        max_pods    = var.kubelet_max_pods
 
         # kube-apiserver
         controller_count        = var.k8s_controlplane_count

@@ -38,7 +38,6 @@ cgroupsPerQOS: true
 cpuCFSQuota: true
 cpuCFSQuotaPeriod: 100ms
 hairpinMode: promiscuous-bridge
-maxPods: 110
 podCIDR:
 resolvConf: /run/systemd/resolve/resolv.conf
 runOnce: false
@@ -54,6 +53,7 @@ shutdownGracePeriod: 30s
 shutdownGracePeriodCriticalPods: 10s
 seccompDefault: true
 registerNode: true
+maxPods: ${max_pods}
 registerWithTaints:
   - key: node.kubernetes.io/unschedulable
     effect: NoSchedule

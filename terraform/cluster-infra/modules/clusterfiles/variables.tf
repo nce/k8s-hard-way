@@ -137,3 +137,7 @@ variable "k8s_pki_front_proxy_crt" {
 variable "k8s_pki_front_proxy_key" {
   type = string
 }
+
+variable "kubelet_max_pods" {
+  type = number
+}

@@ -26,7 +26,7 @@ resource "aws_instance" "instance" {
   iam_instance_profile = module.instanceprofile[count.index].iam_instance_profile_name
 
   metadata_options {
-    http_put_response_hop_limit = 1
+    http_put_response_hop_limit = 2
     http_endpoint               = "enabled"
   }
 

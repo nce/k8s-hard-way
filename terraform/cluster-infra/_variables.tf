@@ -33,6 +33,16 @@ variable "aws_instance_type" {
   default = "t4g.small"
 }
 
+variable "kubelet_max_pods" {
+  # for aws vpc
+  # number of ENIs for the instance type × (the number of IPs per ENI - 1)) + 2
+  # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-eni.html
+  description = "Max Pods per Kubelet"
+  type        = number
+
+  default = 11
+}
+
 variable "ssh_public_key" {
   description = "SSH Public Key used to access all instances"
   type        = string
@@ -109,24 +119,4 @@ variable "github_thumbprint" {
 
   default = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
 }
-
-
-#
-#variable "k8s_pod_cidr" {
-#  description = "CIDR of all pods in the cluster"
-#  type        = string
-#
-#  default = "10.200.0.0/16"
-#}
-#
-
-#
-#
-#variable "aws_controlplane_instance_type" {
-#  description = "AWS Instance type of the controller"
-#  type        = string
-#
-#  default = "t4g.small"
-#}
-#
 

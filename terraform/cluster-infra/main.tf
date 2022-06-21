@@ -70,6 +70,7 @@ module "clusterfiles" {
   k8s_api_extern              = var.k8s_api_extern
   k8s_service_cidr            = var.k8s_service_cidr
   k8s_kubelet_bootstrap_token = "${random_string.kubelet_bootstrap_token_id.id}.${random_password.kubelet_bootstrap_token.result}"
+  kubelet_max_pods            = var.kubelet_max_pods
 
 
   k8s_pki_ca_crt                       = module.pki.ca_crt
@@ -145,7 +146,9 @@ module "controlplane" {
     module.systemsmanager.iam_role_policy_arn,
     module.controlplane_userdata.ignition_s3_policy_arn[i],
     data.aws_iam_policy.AmazonEC2ContainerRegistryReadOnly.arn,
-    data.aws_iam_policy.AmazonEKS_CNI_Policy.arn
+    data.aws_iam_policy.AmazonEKS_CNI_Policy.arn,
+    # workaround till aws-clod-controller supports irsa
+    aws_iam_policy.aws_cloud_controller.arn
   ] }
 
   etcd_discovery_zone_id = module.etcd_dns_discovery.zone_id
