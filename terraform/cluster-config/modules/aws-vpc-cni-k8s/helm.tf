@@ -5,13 +5,18 @@ resource "helm_release" "aws_vpc_cni_k8s" {
   version    = var.chart_version
   namespace  = "kube-system"
 
-  atomic  = true
-  lint    = true
-  timeout = 45
+  atomic          = true
+  cleanup_on_fail = true
+  lint            = true
+  timeout         = 60
 
   values = [<<YAML
-eniConfig:
+cniConfig:
   region: eu-central-1
+eniConfig:
+  create: true
+  region: eu-central-1
+  subnets: {}
 serviceaccount:
   name: aws-vpc-cni
 init:
@@ -19,12 +24,19 @@ init:
     region: eu-central-1
 image:
   region: eu-central-1
+  tag: v1.11.2
 env:
   AWS_VPC_K8S_PLUGIN_LOG_FILE: stderr
   AWS_VPC_K8S_CNI_LOG_FILE: stdout
+  AWS_VPC_K8S_CNI_EXTERNALSNAT: true
+  CLUSTER_NAME: ${var.k8s_cluster_name}
 cri:
   hostPath:
     path: /var/run/containerd/containerd.sock
 YAML
   ]
 }
+#ENIConfig
+#    - id: subnet-034f5d03888353286
+#    - id: subnet-0e3af6ee983edaa9b
+
