@@ -77,20 +77,21 @@ systemd:
 
         [Install]
         WantedBy=multi-user.target
-    - name: k8s-master-labeler.service
+    - name: k8s-labeler.service
       enabled: true
       contents: |
         [Unit]
         Description=Nodelabeler
-        Wants=network-online.target
-        After=network-online.target kubelet.service
+        Requires=coreos-metadata.service
+        After=coreos-metadata.service
 
         [Service]
         Type=oneshot
-        ExecStart=/opt/bin/kubectl --kubeconfig /etc/kubernetes/admin.conf label nodes/%l node-role.kubernetes.io/master= --overwrite
-        ExecStart=/opt/bin/kubectl --kubeconfig /etc/kubernetes/admin.conf label nodes/%l node-role.kubernetes.io/control-plane= --overwrite
-        ExecStop=/opt/bin/kubectl --kubeconfig /etc/kubernetes/admin.conf label nodes/%l node-role.kubernetes.io/master- --overwrite
-        ExecStop=/opt/bin/kubectl --kubeconfig /etc/kubernetes/admin.conf label nodes/%l node-role.kubernetes.io/control-plane- --overwrite
+        EnvironmentFile=/run/metadata/flatcar
+        ExecStart=/opt/bin/kubectl --kubeconfig /etc/kubernetes/admin.conf label nodes/$${COREOS_EC2_INSTANCE_ID} node-role.kubernetes.io/master= --overwrite
+        ExecStart=/opt/bin/kubectl --kubeconfig /etc/kubernetes/admin.conf label nodes/$${COREOS_EC2_INSTANCE_ID} node-role.kubernetes.io/control-plane= --overwrite
+        ExecStop=/opt/bin/kubectl --kubeconfig /etc/kubernetes/admin.conf label nodes/$${COREOS_EC2_INSTANCE_ID} node-role.kubernetes.io/master- --overwrite
+        ExecStop=/opt/bin/kubectl --kubeconfig /etc/kubernetes/admin.conf label nodes/$${COREOS_EC2_INSTANCE_ID} node-role.kubernetes.io/control-plane- --overwrite
         RemainAfterExit=yes
         Restart=on-failure
         StartLimitInterval=0
