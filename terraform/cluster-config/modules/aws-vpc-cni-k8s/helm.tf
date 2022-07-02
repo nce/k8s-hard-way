@@ -30,6 +30,8 @@ env:
   AWS_VPC_K8S_CNI_LOG_FILE: stdout
   AWS_VPC_K8S_CNI_EXTERNALSNAT: true
   CLUSTER_NAME: ${var.k8s_cluster_name}
+  ENABLE_PREFIX_DELEGATION: true
+  AWS_VPC_CNI_NODE_PORT_SUPPORT: true
 cri:
   hostPath:
     path: /var/run/containerd/containerd.sock

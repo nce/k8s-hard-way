@@ -11,6 +11,9 @@ resource "helm_release" "kubelet_csr_approver" {
 
   values = [<<YAML
 providerRegex: "^i-[a-z0-9-_]*(\\.eu-central-1\\.compute\\.internal)?$"
+providerIpPrefixes:
+  - 10.10.0.0/16
+bypassDnsResolution: true
 YAML
   ]
 }

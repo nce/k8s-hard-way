@@ -30,6 +30,13 @@ resource "aws_subnet" "public" {
   availability_zone = each.key
   cidr_block        = cidrsubnet(local.public_cidr, 3, var.az_mapping[each.value.name_suffix])
 
+  map_public_ip_on_launch                     = true
+  enable_resource_name_dns_a_record_on_launch = true
+  # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-naming.html#instance-naming-modify
+  # aws-cloud-controller needs RBN hostnames...
+  private_dns_hostname_type_on_launch = "resource-name"
+
+
   tags = {
     Name                                            = "${var.k8s_cluster_name}-public"
     "kubernetes.io/role/elb"                        = "1"
@@ -44,6 +51,8 @@ resource "aws_subnet" "private" {
   availability_zone = each.key
   cidr_block        = cidrsubnet(local.private_cidr, 3, var.az_mapping[each.value.name_suffix])
 
+  map_public_ip_on_launch                     = false
+  enable_resource_name_dns_a_record_on_launch = true
   # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-naming.html#instance-naming-modify
   # aws-cloud-controller needs RBN hostnames...
   private_dns_hostname_type_on_launch = "resource-name"

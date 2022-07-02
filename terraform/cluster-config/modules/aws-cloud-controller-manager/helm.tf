@@ -10,9 +10,10 @@ resource "helm_release" "aws_cloud_controller_manager" {
   lint    = true
   timeout = 45
 
+  # v1.23.0 is no starting due to version string regex matching
   values = [<<YAML
 image:
-  tag: v1.23.1
+  tag: v1.23.2
 hostNetworking: true
 extraVolumeMounts:
 ${module.irsa_aws_cloud_controller_manager.extraVolumeMounts}
