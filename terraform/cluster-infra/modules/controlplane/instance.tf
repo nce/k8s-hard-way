@@ -21,7 +21,7 @@ resource "aws_instance" "instance" {
   user_data_replace_on_change = true
 
   vpc_security_group_ids      = var.aws_security_group_ids
-  associate_public_ip_address = true
+  associate_public_ip_address = false
 
   iam_instance_profile = module.instanceprofile[count.index].iam_instance_profile_name
 

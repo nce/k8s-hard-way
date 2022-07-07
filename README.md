@@ -40,11 +40,11 @@ going through a major terraform refactoring.
     SSH access is not possible as the instances are configured to use the aws
     systemsmanager
 - Clusteraddons
-  - [ ] CNI with ~~weave~~ ~~calico~~ [aws-vpc](https://github.com/aws/amazon-vpc-cni-k8s)
-  - [ ] CoreDNS
-  - [ ] [kubelet-csr-approver](https://github.com/postfinance/kubelet-csr-approver)  
+  - [x] CNI with ~~weave~~ ~~calico~~ [aws-vpc](https://github.com/aws/amazon-vpc-cni-k8s)
+  - [x] [kubelet-csr-approver](https://github.com/postfinance/kubelet-csr-approver)  
     Automatic kubelet serving approval with [csr](https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-certs/#kubelet-serving-certs)
-  - [ ] [aws-cloud-controller-manager](https://github.com/kubernetes/cloud-provider-aws) (as external cloud provider in k8s)
+  - [ ] CoreDNS
+  - [x] [aws-cloud-controller-manager](https://github.com/kubernetes/cloud-provider-aws) (as external cloud provider in k8s)
   - [ ] [aws-lb-controller](https://github.com/kubernetes-sigs/aws-load-balancer-controller) as ingress class  
     Using IRSA for aws management access
   - [ ] [external_dns](https://github.com/kubernetes-sigs/external-dns) with route53 access  

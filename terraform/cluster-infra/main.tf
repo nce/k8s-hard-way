@@ -158,7 +158,7 @@ module "controlplane" {
 }
 
 resource "local_file" "admin_kubeconfig" {
-  filename        = pathexpand("~/.kube/admin_${var.k8s_cluster_name}")
+  filename        = pathexpand("~/.kube/configs/hardway_${var.k8s_cluster_name}.kubeconfig")
   content         = module.clusterfiles.kubeconfig_admin
   file_permission = "0600"
 }
